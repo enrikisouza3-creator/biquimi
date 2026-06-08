@@ -743,7 +743,9 @@ function byDate(data) {
       map[r.data][f] += r[f];
     });
   });
-  return Object.values(map).sort(function(a, b) { return dateOrd(a.data) - dateOrd(b.data); });
+  return Object.values(map).filter(function(d) {
+    return ['acido','soda','pac','acidoRec','polDec','polFlot','anti'].some(function(f) { return d[f] > 0; });
+  }).sort(function(a, b) { return dateOrd(a.data) - dateOrd(b.data); });
 }
 
 function byOper(data) {
@@ -1542,6 +1544,11 @@ function importarPlanilhaLancamentos(input) {
         if (!r || r.every(function(v) { return v === null || v === undefined || v === ''; })) continue;
         var dataStr2 = iData2 >= 0 ? toDataStr2(r[iData2]) : '';
         if (!dataStr2) { ignorados++; continue; }
+        // Ignorar linhas de totalização ou zeradas
+        if (dataStr2.toLowerCase().includes('total') || dataStr2.toLowerCase().includes('legenda')) { ignorados++; continue; }
+        var campos = [iAcido2, iSoda2, iPac2, iNitrico, iPolDec2, iPolFlo2, iAnti2];
+        var todosZero = campos.every(function(ci) { return ci < 0 || toNum2(r[ci]) === 0; });
+        if (todosZero) { ignorados++; continue; }
         payloads.push({
           data: dataStr2,
           turno: iTurno >= 0 ? String(r[iTurno] || '') : '',
