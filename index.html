@@ -635,8 +635,8 @@
 //  CONSTANTES E VARIÁVEIS GLOBAIS
 // ════════════════════════════════════════════════════════════════
 // ── Supabase config — preencha com seus valores
-const SUPABASE_URL = 'https://pnvjmcztahyfzjklfyaf.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_vfhCHpdLM-iIo-g0k9s3Ng_bMm8pvYZ';
+const SUPABASE_URL = 'https://SEU_PROJECT.supabase.co';
+const SUPABASE_KEY = 'SUA_ANON_KEY';
 const STORAGE_KEY_PRECOS = 'ete_precos_v2'; // preços ficam local (config pessoal)
 
 let consumoData = [];
@@ -1498,7 +1498,16 @@ function importarPlanilhaLancamentos(input) {
       var ws = wb.Sheets[wsName];
       var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
       if (rows.length < 2) { showToast('Planilha vazia ou sem dados', 'error'); setLoading(false); return; }
-      var header = rows[0].map(function(h) { return String(h || '').toLowerCase().trim(); });
+      // Detecta linha real de cabeçalho (ignora título acima)
+      var headerRowIdx = rows.findIndex(function(r) {
+        if (!r) return false;
+        var cells = r.map(function(c) { return String(c || '').toLowerCase().trim(); });
+        return cells.some(function(c) { return c === 'data'; }) &&
+               cells.some(function(c) { return c.includes('operador') || c.includes('cido') || c.includes('soda'); });
+      });
+      if (headerRowIdx < 0) headerRowIdx = 0;
+      var header = rows[headerRowIdx].map(function(h) { return String(h || '').toLowerCase().trim(); });
+      var dataStartIdx = headerRowIdx + 1;
       var colIdx2 = function(terms) {
         for (var ti = 0; ti < terms.length; ti++) {
           var idx = header.findIndex(function(h) { return h.includes(terms[ti]); });
@@ -1528,7 +1537,7 @@ function importarPlanilhaLancamentos(input) {
       };
       var payloads = [];
       var ignorados = 0;
-      for (var ri = 1; ri < rows.length; ri++) {
+      for (var ri = dataStartIdx; ri < rows.length; ri++) {
         var r = rows[ri];
         if (!r || r.every(function(v) { return v === null || v === undefined || v === ''; })) continue;
         var dataStr2 = iData2 >= 0 ? toDataStr2(r[iData2]) : '';
