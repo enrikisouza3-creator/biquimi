@@ -1286,14 +1286,7 @@ function renderCustos() {
     tr.innerHTML = '<td><strong>' + r.data + '</strong></td><td><span class="op-tag">' + r.operador + '</span></td><td>' + fmtQ(r.acido) + '</td><td>' + fmtC(r.custoAcido) + '</td><td>' + fmtQ(r.acidoRec) + '</td><td>' + fmtC(r.custoAcidoRec) + '</td><td><strong style="color:var(--teal-light);font-family:\'Syne\',sans-serif">' + (r.custoTotal > 0 ? fmtBRL(r.custoTotal) : '<span class="zero-cell">—</span>') + '</strong></td>';
     tbody.appendChild(tr);
   });
-  document.getElementById('custoTableFoot').innerHTML =
-    '<tr style="background:var(--panel2);font-weight:700;border-top:2px solid var(--border);">' +
-    '<td colspan="2" style="padding:10px 14px;font-family:\'Syne\',sans-serif;font-size:0.82rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">TOTAL PERÍODO</td>' +
-    '<td style="padding:10px 14px;font-family:\'Syne\',sans-serif;">' + sumField(dadosFiltrados, 'acido').toLocaleString('pt-BR') + '</td>' +
-    '<td style="padding:10px 14px;font-family:\'Syne\',sans-serif;color:var(--red-light);">' + fmtBRL(totalAcido) + '</td>' +
-    '<td style="padding:10px 14px;font-family:\'Syne\',sans-serif;">' + sumField(dadosFiltrados, 'acidoRec').toLocaleString('pt-BR') + '</td>' +
-    '<td style="padding:10px 14px;font-family:\'Syne\',sans-serif;color:var(--orange-light);">' + fmtBRL(totalAcidoRec) + '</td>' +
-    '<td style="padding:10px 14px;font-family:\'Syne\',sans-serif;color:var(--teal-light);font-size:1rem;">' + fmtBRL(totalGeral) + '</td></tr>';
+  document.getElementById('custoTableFoot').innerHTML = '';
   document.getElementById('custoTableCount').textContent = comCusto.length + ' registros';
 
   renderEconomia();
@@ -1556,6 +1549,9 @@ function importarPlanilhaLancamentos(input) {
       };
       var payloads = [];
       var ignorados = 0;
+      // Contagem de registros por data para inferir turno por posição
+      var contPorData = {};
+      var TURNOS_ORDEM = ['Manhã', 'Tarde', 'Noite'];
       for (var ri = dataStartIdx; ri < rows.length; ri++) {
         var r = rows[ri];
         if (!r || r.every(function(v) { return v === null || v === undefined || v === ''; })) continue;
@@ -1567,13 +1563,25 @@ function importarPlanilhaLancamentos(input) {
         if (operadorRaw.includes('total') || operadorRaw.includes('legenda')) { ignorados++; continue; }
         var campos = [iAcido2, iSoda2, iPac2, iNitrico, iPolDec2, iPolFlo2, iAnti2];
         var todosZero = campos.every(function(ci) { return ci < 0 || toNum2(r[ci]) === 0; });
-        var temTurno = iTurno >= 0 && r[iTurno] && String(r[iTurno]).trim() !== '';
+        var turnoExplicito = iTurno >= 0 && r[iTurno] && String(r[iTurno]).trim() !== '';
+        var temTurno = turnoExplicito;
         // Só ignora se todos zeros E não tem turno explícito (linha em branco de preenchimento futuro)
         if (todosZero && !temTurno) { ignorados++; continue; }
+        // Inferir turno por posição quando não há coluna Turno
+        var turnoVal = '';
+        if (turnoExplicito) {
+          turnoVal = String(r[iTurno]).trim();
+        } else {
+          // Contar quantos registros já existem para essa data → 0=Manhã, 1=Tarde, 2=Noite
+          if (!contPorData[dataStr2]) contPorData[dataStr2] = 0;
+          turnoVal = TURNOS_ORDEM[contPorData[dataStr2] % 3];
+          contPorData[dataStr2]++;
+        }
+        var operNome = iOper2 >= 0 ? String(r[iOper2] || '').trim() : '';
         payloads.push({
           data: dataStr2,
-          turno: iTurno >= 0 ? String(r[iTurno] || '') : '',
-          operador: iOper2 >= 0 ? String(r[iOper2] || 'Importado') : 'Importado',
+          turno: turnoVal,
+          operador: operNome,
           acido:     iAcido2 >= 0 ? toNum2(r[iAcido2]) : 0,
           soda:      iSoda2  >= 0 ? toNum2(r[iSoda2])  : 0,
           pac:       iPac2   >= 0 ? toNum2(r[iPac2])   : 0,
