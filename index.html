@@ -632,6 +632,303 @@
 <footer>Dashboard ETE Químicos · Danone · <span id="footerDate"></span></footer>
 
 <script>
+// ════════════════════════════════════════════════════════════════
+//  CONSTANTES E VARIÁVEIS GLOBAIS
+// ════════════════════════════════════════════════════════════════
+const EXCEL_URL = "https://danone.sharepoint.com/sites/BRAZIL-MEIOAMBIENTEEDP/_api/web/GetFileByServerRelativeUrl('/sites/BRAZIL-MEIOAMBIENTEEDP/Shared%20Documents/ETE_Quimicos_Cruzamento_por%20nomes.xlsx')/$value";
+const STORAGE_KEY_LANCAMENTOS = 'ete_lancamentos_v2';
+const STORAGE_KEY_PRECOS = 'ete_precos_v2';
+
+let consumoData = [];
+let cruzamentoData = [];
+let lancamentos = [];
+let tableFiltered = [];
+let tablePage = 1;
+const perPage = 15;
+let selectedOpers = new Set();
+
+const COLORS = {
+  acido: '#e04535', pac: '#0fa899', acidoRec: '#e8700e',
+  polDec: '#8b5cf6', polFlot: '#d4920f', anti: '#7a8499', soda: '#2471e8'
+};
+const LABELS = {
+  acido: 'Ácido Sulfúrico', pac: 'PAC (kg)', acidoRec: 'Ácido Nítrico',
+  polDec: 'Pol. Decanter', polFlot: 'Pol. Flotadores', anti: 'Antiespumante', soda: 'Soda (kg)'
+};
+let charts = {};
+
+// ════════════════════════════════════════════════════════════════
+//  UTILITÁRIOS
+// ════════════════════════════════════════════════════════════════
+const TODAY = new Date();
+TODAY.setHours(0, 0, 0, 0);
+document.getElementById('dataAtual').textContent = 'Hoje: ' + TODAY.toLocaleDateString('pt-BR');
+document.getElementById('footerDate').textContent = TODAY.toLocaleDateString('pt-BR');
+
+function showToast(msg, type) {
+  type = type || 'success';
+  const t = document.getElementById('toast');
+  t.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(function() { t.className = 'toast'; }, 4000);
+}
+
+function setLoading(on) {
+  document.getElementById('loadingBar').style.display = on ? 'block' : 'none';
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('onclick').includes("'" + id + "'"));
+  });
+  document.querySelectorAll('.tab-panel').forEach(function(p) {
+    p.classList.toggle('active', p.id === 'tab-' + id);
+  });
+}
+
+function parseNum(v) {
+  if (!v && v !== 0) return 0;
+  if (typeof v === 'number') return v;
+  return parseFloat(String(v).replace(',', '.')) || 0;
+}
+
+function serialToDateStr(v) {
+  if (!v && v !== 0) return '';
+  if (v instanceof Date) {
+    return String(v.getDate()).padStart(2, '0') + '/' + String(v.getMonth() + 1).padStart(2, '0');
+  }
+  var n = Number(v);
+  if (!isNaN(n) && n > 40000) {
+    var ms = (n - 25569) * 86400000;
+    var dt = new Date(ms);
+    return String(dt.getUTCDate()).padStart(2, '0') + '/' + String(dt.getUTCMonth() + 1).padStart(2, '0');
+  }
+  var s = String(v).trim();
+  if (/^\d{1,2}\/\d{1,2}/.test(s)) {
+    var parts = s.split('/');
+    return parts[0].padStart(2, '0') + '/' + parts[1].padStart(2, '0');
+  }
+  return s.slice(0, 5);
+}
+
+function sumField(data, field) {
+  return data.reduce(function(s, r) { return s + (r[field] || 0); }, 0);
+}
+
+function sortDates(arr) {
+  return arr.sort(function(a, b) {
+    return dateOrd(a) - dateOrd(b);
+  });
+}
+
+function dateOrd(d) {
+  if (!d) return 0;
+  var parts = d.split('/');
+  return Number(parts[1]) * 100 + Number(parts[0]);
+}
+
+function fmtBRL(v) {
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+}
+
+function fmtNum(v) {
+  return v.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+}
+
+function byDate(data) {
+  var map = {};
+  data.forEach(function(r) {
+    if (!map[r.data]) map[r.data] = { data: r.data, acido: 0, soda: 0, pac: 0, acidoRec: 0, polDec: 0, polFlot: 0, anti: 0 };
+    ['acido', 'soda', 'pac', 'acidoRec', 'polDec', 'polFlot', 'anti'].forEach(function(f) {
+      map[r.data][f] += r[f];
+    });
+  });
+  return Object.values(map).sort(function(a, b) { return dateOrd(a.data) - dateOrd(b.data); });
+}
+
+function byOper(data) {
+  var map = {};
+  data.forEach(function(r) {
+    if (!map[r.operador]) map[r.operador] = { operador: r.operador, acido: 0, soda: 0, pac: 0, acidoRec: 0, polDec: 0, polFlot: 0, anti: 0, total: 0 };
+    ['acido', 'soda', 'pac', 'acidoRec', 'polDec', 'polFlot', 'anti'].forEach(function(f) {
+      map[r.operador][f] += r[f];
+    });
+    map[r.operador].total += r.acido + r.soda + r.pac + r.acidoRec + r.polDec + r.polFlot + r.anti;
+  });
+  return Object.values(map).sort(function(a, b) { return b.total - a.total; });
+}
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  STORAGE (apenas preços e lançamentos)
+// ════════════════════════════════════════════════════════════════
+function savePrecos(p) {
+  try { localStorage.setItem(STORAGE_KEY_PRECOS, JSON.stringify(p)); } catch(e) {}
+}
+
+function loadPrecos() {
+  try {
+    var p = localStorage.getItem(STORAGE_KEY_PRECOS);
+    return p ? JSON.parse(p) : null;
+  } catch(e) { return null; }
+}
+
+function saveLancamentos(arr) {
+  try { localStorage.setItem(STORAGE_KEY_LANCAMENTOS, JSON.stringify(arr)); } catch(e) {}
+}
+
+function loadLancamentos() {
+  try {
+    var l = localStorage.getItem(STORAGE_KEY_LANCAMENTOS);
+    return l ? JSON.parse(l) : [];
+  } catch(e) { return []; }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CARREGAR DADOS DO EXCEL (SHAREPOINT)
+// ════════════════════════════════════════════════════════════════
+async function carregarDados() {
+  setLoading(true);
+  document.getElementById('lastImport').style.display = 'none';
+  try {
+    var response = await fetch(EXCEL_URL, { credentials: 'include' });
+    if (!response.ok) {
+      throw new Error('Erro HTTP ' + response.status + ': ' + response.statusText);
+    }
+    var buffer = await response.arrayBuffer();
+    var workbook = XLSX.read(buffer, { type: 'array', cellDates: false });
+
+    // Aba de consumo (primeira aba ou "Consumo")
+    var consumoSheetName = workbook.SheetNames.find(function(n) {
+      return n.toLowerCase().includes('consumo');
+    }) || workbook.SheetNames[0];
+    var ws = workbook.Sheets[consumoSheetName];
+    var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
+
+    // Detectar linha de cabeçalho
+    var hIdx = rows.findIndex(function(r) {
+      return r && r.some(function(c) {
+        var s = String(c || '').toLowerCase();
+        return s.includes('operador') || s === 'data';
+      });
+    });
+    if (hIdx < 0) hIdx = 0;
+
+    var headerRow = rows[hIdx] || [];
+    function colIdx(keywords) {
+      return headerRow.findIndex(function(h) {
+        if (h === null || h === undefined) return false;
+        var s = String(h).toLowerCase();
+        return keywords.some(function(k) { return s.includes(k); });
+      });
+    }
+
+    var iData    = colIdx(['data']);
+    var iOper    = colIdx(['operador']);
+    var iAcidoS  = colIdx(['sulfúrico', 'sulfurico', 'sulf']);
+    var iSoda    = colIdx(['soda']);
+    var iPac     = colIdx(['pac']);
+    var iAcidoN  = colIdx(['nítrico', 'nitrico', 'nit.']);
+    var iPolDec  = colIdx(['decanter', 'dec.']);
+    var iPolFlo  = colIdx(['flotador', 'flot.', 'flonex']);
+    var iAnti    = colIdx(['antiespumante', 'anti']);
+    var iObs     = colIdx(['obs']);
+
+    function ci(i, fb) { return i >= 0 ? i : fb; }
+    var toNum = function(v) { var n = parseFloat(String(v || '').replace(',', '.')); return isNaN(n) ? 0 : n; };
+
+    var parsed = [];
+    rows.slice(hIdx + 1).forEach(function(row) {
+      if (!row || row.every(function(c) { return c === null || c === ''; })) return;
+      var col0 = String(row[ci(iData, 0)] || '').trim().toLowerCase();
+      if (col0.includes('total') || col0.includes('legenda') || col0.includes('cruzamento')) return;
+      var rawData = row[ci(iData, 0)];
+      var rawOp   = String(row[ci(iOper, 1)] || '').trim();
+      var hasVals = row.slice(2).some(function(v) { return v !== null && v !== '' && !isNaN(Number(v)) && Number(v) > 0; });
+      var op = rawOp && !rawOp.toLowerCase().includes('total') ? rawOp : (hasVals ? 'Não identificado' : null);
+      if (!op) return;
+      var dataStr = serialToDateStr(rawData);
+      if (!dataStr) return;
+      parsed.push({
+        data:     dataStr,
+        operador: op,
+        acido:    toNum(row[ci(iAcidoS, 2)]),
+        soda:     toNum(row[ci(iSoda, 3)]),
+        pac:      toNum(row[ci(iPac, 4)]),
+        acidoRec: toNum(row[ci(iAcidoN, 5)]),
+        polDec:   toNum(row[ci(iPolDec, 6)]),
+        polFlot:  toNum(row[ci(iPolFlo, 7)]),
+        anti:     toNum(row[ci(iAnti, 8)]),
+        obs:      String(row[ci(iObs, 9)] || '').trim()
+      });
+    });
+
+    if (parsed.length === 0) {
+      throw new Error('Nenhum dado encontrado na planilha. Verifique os cabeçalhos das colunas.');
+    }
+
+    consumoData = parsed;
+
+    // Aba cruzamento (opcional)
+    var cruzSheetName = workbook.SheetNames.find(function(n) { return n.toLowerCase().includes('cruzamento'); });
+    cruzamentoData = [];
+    if (cruzSheetName) {
+      var cws = workbook.Sheets[cruzSheetName];
+      var crows = XLSX.utils.sheet_to_json(cws, { header: 1, defval: null });
+      var chIdx = crows.findIndex(function(r) {
+        return r && r.some(function(c) { return String(c || '').toLowerCase().includes('qu'); });
+      });
+      if (chIdx >= 0) {
+        crows.slice(chIdx + 1).forEach(function(r) {
+          if (!r || !r[0] || String(r[0]).toLowerCase().includes('legenda')) return;
+          var toN = function(v) { var n = parseFloat(String(v || '').replace(',', '.')); return isNaN(n) ? null : n; };
+          var statusRaw = String(r[6] || '');
+          var status = 'sem-dados';
+          if (statusRaw.includes('OK') || statusRaw.toLowerCase().includes('consistente')) status = 'ok';
+          else if (statusRaw.includes('alerta') || statusRaw.toLowerCase().includes('leve')) status = 'alerta';
+          else if (statusRaw.toLowerCase().includes('diverg')) status = 'divergencia';
+          cruzamentoData.push({
+            quimico: String(r[0]).trim(),
+            unidade: String(r[1] || '').trim(),
+            estoqueInicial: toN(r[2]),
+            estoqueFinal: toN(r[3]),
+            consumoAcumulado: toN(r[4]),
+            variacao: toN(r[5]),
+            status: status,
+            obs: String(r[7] || '').trim()
+          });
+        });
+      }
+    }
+
+    var datas = [...new Set(consumoData.map(function(r) { return r.data; }))];
+    datas = sortDates(datas);
+    var periodo = datas.length > 1 ? datas[0] + ' a ' + datas[datas.length - 1] : (datas[0] || '');
+    var li = document.getElementById('lastImport');
+    li.textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR') + ' · ' + periodo;
+    li.style.display = 'flex';
+
+    var naoIdent = consumoData.filter(function(r) { return r.operador === 'Não identificado'; }).length;
+    var banner = document.getElementById('infoBanner');
+    if (naoIdent > 0) {
+      banner.style.display = 'flex';
+      banner.innerHTML = '<strong>' + naoIdent + ' registro(s)</strong>&nbsp;sem operador identificado · ' + parsed.length + ' registros carregados.';
+    } else {
+      banner.style.display = 'none';
+    }
+
+    initDashboard();
+    showToast(parsed.length + ' registros carregados · ' + periodo);
+
+  } catch (err) {
+    console.error('Erro ao carregar Excel:', err);
+    showToast('Erro ao carregar: ' + err.message, 'error');
+  }
+  setLoading(false);
+}
 
 // ════════════════════════════════════════════════════════════════
 //  OPERADOR FILTER
