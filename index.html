@@ -1518,7 +1518,7 @@ function importarPlanilhaLancamentos(input) {
       var iData2   = colIdx2(['data']);
       var iTurno   = colIdx2(['turno']);
       var iOper2   = colIdx2(['operador', 'oper']);
-      var iAcido2  = colIdx2(['sulfúrico', 'sulfurico', 'ácido sul', 'acido sul']);
+      var iAcido2  = colIdx2(['sulfúrico', 'sulfurico', 'súlfurico', 'ácido sul', 'acido sul', 'cido s']);
       var iSoda2   = colIdx2(['soda']);
       var iPac2    = colIdx2(['pac']);
       var iNitrico = colIdx2(['nítrico', 'nitrico', 'acidorec']);
@@ -1544,7 +1544,7 @@ function importarPlanilhaLancamentos(input) {
         if (!dataStr2) { ignorados++; continue; }
         payloads.push({
           data: dataStr2,
-          turno: iTurno >= 0 ? String(r[iTurno] || 'Manhã') : 'Manhã',
+          turno: iTurno >= 0 ? String(r[iTurno] || '') : '',
           operador: iOper2 >= 0 ? String(r[iOper2] || 'Importado') : 'Importado',
           acido:     iAcido2 >= 0 ? toNum2(r[iAcido2]) : 0,
           soda:      iSoda2  >= 0 ? toNum2(r[iSoda2])  : 0,
