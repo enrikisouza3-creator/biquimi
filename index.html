@@ -123,6 +123,17 @@
   .cruz-status.sem-dados{background:rgba(122,132,153,0.12);color:var(--gray);border:1px solid rgba(122,132,153,0.25);}
   .cruz-status.sem-dados::before{background:var(--gray);}
   .cruz-obs{font-size:0.72rem;color:var(--text-muted);margin-top:6px;font-style:italic;}
+  .est-input{border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--panel);color:var(--text);width:120px;transition:border-color 0.2s;}
+  .est-input:focus{outline:none;border-color:var(--teal);}
+  #estTableBody tr{border-bottom:1px solid var(--border);}
+  #estTableBody tr:last-child{border-bottom:none;}
+  #estTableBody td{padding:8px 12px;vertical-align:middle;}
+  .quim-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle;}
+  .hist-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:12px;font-size:0.68rem;font-weight:600;}
+  .hist-badge.ok{background:rgba(34,168,74,0.1);color:#22a84a;border:1px solid rgba(34,168,74,0.2);}
+  .hist-badge.alerta{background:rgba(210,153,34,0.1);color:#d4920f;border:1px solid rgba(210,153,34,0.2);}
+  .hist-badge.divergencia{background:rgba(224,69,53,0.1);color:#e04535;border:1px solid rgba(224,69,53,0.2);}
+  .hist-badge.sem-dados{background:rgba(122,132,153,0.1);color:#7a8499;border:1px solid rgba(122,132,153,0.2);}
   .custos-precos{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
   .custos-precos-title{font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
   .custos-precos-sub{font-size:0.76rem;color:var(--text-muted);margin-bottom:16px;}
@@ -433,11 +444,94 @@
 
 <!-- CRUZAMENTO -->
 <div class="tab-panel" id="tab-cruzamento">
+
+  <!-- FORMULÁRIO DE LANÇAMENTO DE ESTOQUE -->
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px">Lançar Estoque</div>
+        <div style="font-size:0.75rem;color:var(--text-muted)">Registre o estoque inicial e final de cada químico para cruzar com o consumo dos operadores</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <select id="estPeriodoSel" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="carregarEstoquePeriodo()">
+          <option value="">— Selecione período —</option>
+        </select>
+        <button onclick="salvarEstoque()" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:0.82rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;">💾 Salvar Estoque</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;font-weight:500;">Data Inicial</label>
+        <input type="date" id="estDataIni" style="border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--panel);color:var(--text);">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;font-weight:500;">Data Final</label>
+        <input type="date" id="estDataFim" style="border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--panel);color:var(--text);">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;font-weight:500;">Observação geral</label>
+        <input type="text" id="estObs" placeholder="opcional" style="border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--panel);color:var(--text);min-width:220px;">
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.82rem;" id="estTable">
+        <thead>
+          <tr style="background:var(--panel2);">
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Químico</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Unidade</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Estoque Inicial</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Estoque Final</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Obs. específica</th>
+          </tr>
+        </thead>
+        <tbody id="estTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RESULTADOS DO CRUZAMENTO -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);">Cruzamento: Estoque vs Consumo dos Operadores</div>
+      <div id="cruzPeriodoLabel" style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <select id="cruzPeriodoFiltro" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderCruzamento()">
+        <option value="">Período mais recente</option>
+      </select>
+      <button onclick="excluirEstoquePeriodo()" style="background:transparent;color:var(--red-light);border:1px solid var(--red-light);border-radius:8px;padding:6px 12px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;">🗑 Excluir período</button>
+    </div>
+  </div>
+
   <div class="cruz-grid" id="cruzGrid"></div>
+
   <div class="card" style="margin-bottom:24px">
     <div class="card-title">Variação de Estoque vs Consumo Acumulado</div>
+    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;">Verde = consistente · Vermelho = divergência acima de 200 unidades</div>
     <div class="chart-wrap"><canvas id="chartCruz"></canvas></div>
   </div>
+
+  <!-- TABELA DETALHADA -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-title">Histórico de Estoques Lançados</div>
+    <div style="overflow-x:auto;margin-top:8px;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.8rem;" id="histEstoqueTable">
+        <thead>
+          <tr style="background:var(--panel2);">
+            <th style="padding:9px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Período</th>
+            <th style="padding:9px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Químico</th>
+            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Est. Inicial</th>
+            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Est. Final</th>
+            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Consumo Op.</th>
+            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Variação</th>
+            <th style="padding:9px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Status</th>
+          </tr>
+        </thead>
+        <tbody id="histEstoqueBody"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- CUSTOS -->
