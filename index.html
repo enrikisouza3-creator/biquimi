@@ -1170,7 +1170,7 @@ function renderTable() {
 
 function renderCruzamento() {
   if (!cruzamentoData || cruzamentoData.length === 0) {
-    document.getElementById('cruzGrid').innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:0.85rem;">Nenhum dado de cruzamento disponível na planilha.</div>';
+    document.getElementById('cruzGrid').innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:0.85rem;">Nenhum estoque lançado para o período selecionado.</div>';
     return;
   }
   var statusLabel = { ok: 'Consistente', alerta: 'Divergência Leve', divergencia: 'Divergência', 'sem-dados': 'Sem Estoque' };
