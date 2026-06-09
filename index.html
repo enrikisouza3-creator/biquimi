@@ -335,7 +335,7 @@
   <button class="tab-btn" onclick="switchTab('consumo-dia')">Consumo por Dia</button>
   <button class="tab-btn" onclick="switchTab('por-operador')">Por Operador</button>
   <button class="tab-btn" onclick="switchTab('tabela')">Tabela Detalhada</button>
-  <button class="tab-btn" onclick="switchTab('cruzamento')">Cruzamento Estoque</button>
+  <button class="tab-btn" onclick="switchTab('cruzamento')">📊 Comparativo SharePoint</button>
   <button class="tab-btn" onclick="switchTab('custos')">Custos</button>
   <button class="tab-btn" onclick="switchTab('lancamento')">✚ Lançar Consumo</button>
   <button class="tab-btn" onclick="switchTab('apresentacao');initApresentacao()">▶ Apresentação</button>
@@ -445,89 +445,80 @@
 <!-- CRUZAMENTO -->
 <div class="tab-panel" id="tab-cruzamento">
 
-  <!-- FORMULÁRIO DE LANÇAMENTO DE ESTOQUE -->
+  <!-- LANÇAMENTO DIÁRIO DO SHAREPOINT -->
   <div class="card" style="margin-bottom:20px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;">
       <div>
-        <div class="card-title" style="margin-bottom:2px">Lançar Estoque</div>
-        <div style="font-size:0.75rem;color:var(--text-muted)">Registre o estoque inicial e final de cada químico para cruzar com o consumo dos operadores</div>
+        <div class="card-title" style="margin-bottom:2px">📋 Lançar Consumo Diário do SharePoint</div>
+        <div style="font-size:0.75rem;color:var(--text-muted)">Informe a data e o consumo total do dia (3 turnos) conforme a planilha do SharePoint</div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <select id="estPeriodoSel" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="carregarEstoquePeriodo()">
-          <option value="">— Selecione período —</option>
-        </select>
-        <button onclick="salvarEstoque()" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:0.82rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;">💾 Salvar Estoque</button>
-      </div>
+      <button onclick="salvarSpt()" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:0.82rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;">💾 Salvar</button>
     </div>
-    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <label style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;font-weight:500;">Data Inicial</label>
-        <input type="date" id="estDataIni" style="border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--panel);color:var(--text);">
-      </div>
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <label style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;font-weight:500;">Data Final</label>
-        <input type="date" id="estDataFim" style="border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--panel);color:var(--text);">
-      </div>
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <label style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;font-weight:500;">Observação geral</label>
-        <input type="text" id="estObs" placeholder="opcional" style="border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--panel);color:var(--text);min-width:220px;">
-      </div>
+    <div style="margin-bottom:14px;margin-top:14px;">
+      <label style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;font-weight:500;display:block;margin-bottom:4px;">Data</label>
+      <input type="date" id="sptData" style="border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--panel);color:var(--text);">
     </div>
     <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-size:0.82rem;" id="estTable">
+      <table style="width:100%;border-collapse:collapse;font-size:0.82rem;" id="sptLancTable">
         <thead>
           <tr style="background:var(--panel2);">
             <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Químico</th>
             <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Unidade</th>
-            <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Estoque Inicial</th>
-            <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Estoque Final</th>
-            <th style="padding:10px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Obs. específica</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:#2471e8;font-size:0.72rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Consumo SharePoint (dia todo)</th>
           </tr>
         </thead>
-        <tbody id="estTableBody"></tbody>
+        <tbody id="sptLancBody"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- RESULTADOS DO CRUZAMENTO -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-    <div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);">Cruzamento: Estoque vs Consumo dos Operadores</div>
-      <div id="cruzPeriodoLabel" style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;"></div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <select id="cruzPeriodoFiltro" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderCruzamentoSupabase()">
-        <option value="">Período mais recente</option>
-      </select>
-      <button onclick="excluirEstoquePeriodo()" style="background:transparent;color:var(--red-light);border:1px solid var(--red-light);border-radius:8px;padding:6px 12px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;">🗑 Excluir período</button>
+  <!-- FILTROS E SELETOR DE QUÍMICO -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);">Operadores vs SharePoint</div>
+    <select id="sptQuimicoFiltro" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderSptComparativo()">
+      <option value="acido">Ácido Sulfúrico</option>
+      <option value="pac">PAC</option>
+      <option value="polDec">Pol. Decanter</option>
+      <option value="polFlot">Pol. Flotadores</option>
+      <option value="acidoRec">Ácido Nítrico</option>
+      <option value="soda">Soda</option>
+      <option value="anti">Antiespumante</option>
+    </select>
+    <div style="display:flex;gap:8px;margin-left:auto;">
+      <select id="sptFiltroIni" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderSptComparativo()"><option value="">De</option></select>
+      <select id="sptFiltroFim" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderSptComparativo()"><option value="">Até</option></select>
     </div>
   </div>
 
-  <div class="cruz-grid" id="cruzGrid"></div>
+  <!-- KPIs DE DIVERGÊNCIA -->
+  <div id="sptKpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;"></div>
 
-  <div class="card" style="margin-bottom:24px">
-    <div class="card-title">Variação de Estoque vs Consumo Acumulado</div>
-    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;">Verde = consistente · Vermelho = divergência acima de 200 unidades</div>
-    <div class="chart-wrap"><canvas id="chartCruz"></canvas></div>
+  <!-- GRÁFICO DE LINHAS -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title" id="sptChartTitle">Consumo Diário: Operadores vs SharePoint</div>
+    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;">Linha teal = operadores (WhatsApp) · Linha azul = SharePoint · A diferença entre elas é o que precisa bater</div>
+    <div class="chart-wrap" style="height:300px"><canvas id="chartSpt"></canvas></div>
   </div>
 
-  <!-- TABELA DETALHADA -->
+  <!-- TABELA DETALHADA DE DIFERENÇAS -->
   <div class="card" style="margin-bottom:24px">
-    <div class="card-title">Histórico de Estoques Lançados</div>
-    <div style="overflow-x:auto;margin-top:8px;">
-      <table style="width:100%;border-collapse:collapse;font-size:0.8rem;" id="histEstoqueTable">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+      <div class="card-title" style="margin-bottom:0">Detalhe por Dia</div>
+      <div id="sptCustoTotalBadge" style="display:none;background:rgba(218,54,51,0.08);border:1px solid rgba(218,54,51,0.3);border-radius:8px;padding:6px 14px;font-family:'Syne',sans-serif;font-size:0.8rem;font-weight:700;color:#e04535;"></div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
         <thead>
           <tr style="background:var(--panel2);">
-            <th style="padding:9px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Período</th>
-            <th style="padding:9px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Químico</th>
-            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Est. Inicial</th>
-            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Est. Final</th>
-            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Consumo Op.</th>
-            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Variação</th>
+            <th style="padding:9px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Data</th>
+            <th style="padding:9px 12px;text-align:right;font-weight:600;color:#0fa899;font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Operadores (kg)</th>
+            <th style="padding:9px 12px;text-align:right;font-weight:600;color:#2471e8;font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">SharePoint (kg)</th>
+            <th style="padding:9px 12px;text-align:right;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Diferença (kg)</th>
+            <th style="padding:9px 12px;text-align:right;font-weight:600;color:#e04535;font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">💸 Custo Dif.</th>
             <th style="padding:9px 12px;text-align:left;font-weight:600;color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;border-bottom:1px solid var(--border);">Status</th>
           </tr>
         </thead>
-        <tbody id="histEstoqueBody"></tbody>
+        <tbody id="sptDetalheBody"></tbody>
       </table>
     </div>
   </div>
@@ -735,7 +726,7 @@ const SUPABASE_KEY = 'sb_publishable_vfhCHpdLM-iIo-g0k9s3Ng_bMm8pvYZ';
 const STORAGE_KEY_PRECOS = 'ete_precos_v2'; // preços ficam local (config pessoal)
 
 let consumoData = [];
-let cruzamentoData = [];
+// sptData é declarado no bloco de comparativo SharePoint abaixo
 let lancamentos = [];
 let tableFiltered = [];
 let tablePage = 1;
@@ -1168,36 +1159,7 @@ function renderTable() {
   }
 }
 
-function renderCruzamento() {
-  if (!cruzamentoData || cruzamentoData.length === 0) {
-    document.getElementById('cruzGrid').innerHTML = '<div style="padding:24px;color:var(--text-muted);font-size:0.85rem;">Nenhum estoque lançado para o período selecionado.</div>';
-    return;
-  }
-  var statusLabel = { ok: 'Consistente', alerta: 'Divergência Leve', divergencia: 'Divergência', 'sem-dados': 'Sem Estoque' };
-  document.getElementById('cruzGrid').innerHTML = cruzamentoData.map(function(c) {
-    return '<div class="cruz-card ' + c.status + '"><div class="cruz-quimico">' + c.quimico + ' <span style="font-size:0.7rem;font-weight:400;color:var(--text-muted)">(' + c.unidade + ')</span></div>' +
-      '<div class="cruz-row"><span class="cruz-label">Estoque inicial</span><span class="cruz-val">' + (c.estoqueInicial !== null ? c.estoqueInicial.toLocaleString('pt-BR') : '—') + '</span></div>' +
-      '<div class="cruz-row"><span class="cruz-label">Estoque final</span><span class="cruz-val">' + (c.estoqueFinal !== null ? c.estoqueFinal.toLocaleString('pt-BR') : '—') + '</span></div>' +
-      '<div class="cruz-row"><span class="cruz-label">Consumo acumulado</span><span class="cruz-val">' + (c.consumoAcumulado !== null ? c.consumoAcumulado.toLocaleString('pt-BR') : '—') + '</span></div>' +
-      '<div class="cruz-row"><span class="cruz-label">Variação estoque</span><span class="cruz-val" style="color:' + (c.variacao !== null && Math.abs(c.variacao) > 200 ? 'var(--red-light)' : 'inherit') + '">' + (c.variacao !== null ? c.variacao.toLocaleString('pt-BR') : '—') + '</span></div>' +
-      '<div><span class="cruz-status ' + c.status + '">' + (statusLabel[c.status] || c.status) + '</span></div>' +
-      (c.obs ? '<div class="cruz-obs">' + c.obs + '</div>' : '') + '</div>';
-  }).join('');
-
-  var cruzWithData = cruzamentoData.filter(function(c) { return c.consumoAcumulado !== null; });
-  destroyChart('chartCruz');
-  charts['chartCruz'] = new Chart(document.getElementById('chartCruz'), {
-    type: 'bar',
-    data: {
-      labels: cruzWithData.map(function(c) { return c.quimico; }),
-      datasets: [
-        { label: 'Consumo Acumulado', data: cruzWithData.map(function(c) { return c.consumoAcumulado; }), backgroundColor: '#0fa899', borderRadius: 4, borderSkipped: false },
-        { label: 'Variação Estoque', data: cruzWithData.map(function(c) { return c.variacao; }), backgroundColor: cruzWithData.map(function(c) { return c.variacao === null ? '#ccc' : Math.abs(c.variacao) > 200 ? '#e04535' : '#22a84a'; }), borderRadius: 4, borderSkipped: false }
-      ]
-    },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#6b7897', font: { size: 11 }, boxWidth: 10, boxHeight: 10, padding: 12 } } }, scales: { x: { grid: { display: false }, ticks: { color: '#1a2035', font: { size: 11 } } }, y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 11 } } } } }
-  });
-}
+// renderCruzamento removido — substituído por renderSptComparativo
 
 // ════════════════════════════════════════════════════════════════
 //  CUSTOS
@@ -1918,9 +1880,9 @@ function initDashboard() {
   renderOperCharts();
   buildTableFilters();
   renderTable();
-  renderCruzamento();
   buildCustosFiltros();
   renderCustos();
+  buildSptFiltros();
 }
 
 // ── Carregar preços salvos
@@ -1942,402 +1904,318 @@ if (lancDataInput) lancDataInput.value = new Date().toISOString().split('T')[0];
 // ════════════════════════════════════════════════════════════════
 //  ESTOQUE — definição dos químicos
 // ════════════════════════════════════════════════════════════════
-var QUIMICOS_EST = [
-  { key: 'acido_sulfurico',  label: 'Ácido Sulfúrico',  unidade: 'kg', cor: '#e04535' },
-  { key: 'soda',             label: 'Soda',             unidade: 'kg', cor: '#2471e8' },
-  { key: 'pac',              label: 'PAC',              unidade: 'kg', cor: '#0fa899' },
-  { key: 'acido_nitrico',    label: 'Ácido Nítrico',    unidade: 'kg', cor: '#e8700e' },
-  { key: 'pol_decanter',     label: 'Pol. Decanter',    unidade: 'kg', cor: '#8b5cf6' },
-  { key: 'pol_flotadores',   label: 'Pol. Flotadores',  unidade: 'kg', cor: '#d4920f' },
-  { key: 'antiespumante',    label: 'Antiespumante',    unidade: 'L',  cor: '#7a8499' }
+
+// ════════════════════════════════════════════════════════════════
+//  MAPA DE CAMPOS: campo consumo operadores → label e preço
+// ════════════════════════════════════════════════════════════════
+var SPT_QUIMICOS = [
+  { campo: 'acido',    label: 'Ácido Sulfúrico', cor: '#e04535', unidade: 'kg', precoId: 'precoAcido'    },
+  { campo: 'pac',      label: 'PAC',             cor: '#0fa899', unidade: 'kg', precoId: 'precoPac'      },
+  { campo: 'polDec',   label: 'Pol. Decanter',   cor: '#8b5cf6', unidade: 'kg', precoId: 'precoPolDec'   },
+  { campo: 'polFlot',  label: 'Pol. Flotadores', cor: '#d4920f', unidade: 'kg', precoId: 'precoPolFlot'  },
+  { campo: 'acidoRec', label: 'Ácido Nítrico',   cor: '#e8700e', unidade: 'kg', precoId: 'precoAcidoRec' },
+  { campo: 'soda',     label: 'Soda',            cor: '#2471e8', unidade: 'kg', precoId: 'precoSoda'     },
+  { campo: 'anti',     label: 'Antiespumante',   cor: '#7a8499', unidade: 'L',  precoId: 'precoAnti'     }
 ];
 
-// Mapa: key de estoque → campo de consumo nos lançamentos
-var EST_CONSUMO_MAP = {
-  'acido_sulfurico': 'acido',
-  'soda':            'soda',
-  'pac':             'pac',
-  'acido_nitrico':   'acidoRec',
-  'pol_decanter':    'polDec',
-  'pol_flotadores':  'polFlot',
-  'antiespumante':   'anti'
-};
+// Dados do SharePoint carregados do Supabase: [{data_iso, campo, valor}]
+var sptData = [];
 
-// ────────────────────────────────────────────────────────────────
-//  Inicializar tabela de lançamento de estoque
-// ────────────────────────────────────────────────────────────────
-function iniciarTabelaEstoque() {
-  var tbody = document.getElementById('estTableBody');
+// ════════════════════════════════════════════════════════════════
+//  INICIALIZAR TABELA DE LANÇAMENTO DO SHAREPOINT
+// ════════════════════════════════════════════════════════════════
+function iniciarTabelaSpt() {
+  var tbody = document.getElementById('sptLancBody');
   if (!tbody) return;
   tbody.innerHTML = '';
-  QUIMICOS_EST.forEach(function(q) {
+  SPT_QUIMICOS.forEach(function(q) {
     var tr = document.createElement('tr');
     tr.innerHTML =
       '<td><span style="display:inline-flex;align-items:center;gap:8px;">' +
         '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + q.cor + ';flex-shrink:0"></span>' +
         '<strong>' + q.label + '</strong></span></td>' +
       '<td style="color:var(--text-muted);font-size:0.8rem;">' + q.unidade + '</td>' +
-      '<td><input type="number" class="est-input" id="est_ini_' + q.key + '" min="0" step="0.1" placeholder="0"></td>' +
-      '<td><input type="number" class="est-input" id="est_fin_' + q.key + '" min="0" step="0.1" placeholder="0"></td>' +
-      '<td><input type="text"   class="est-input" id="est_obs_' + q.key + '" placeholder="opcional" style="width:180px;"></td>';
+      '<td><input type="number" class="est-input" id="spt_val_' + q.campo + '" min="0" step="0.1" placeholder="0" style="border-color:#2471e8;background:rgba(36,113,232,0.05);"></td>';
     tbody.appendChild(tr);
   });
 }
 
-// ────────────────────────────────────────────────────────────────
-//  Carregar lista de períodos disponíveis no select
-// ────────────────────────────────────────────────────────────────
-async function carregarPeriodosEstoque() {
-  try {
-    var rows = await sbGet('ete_estoques', '&select=periodo_key,data_ini,data_fim');
-    // Pegar períodos únicos
-    var periodos = {};
-    rows.forEach(function(r) {
-      if (r.periodo_key && !periodos[r.periodo_key]) {
-        periodos[r.periodo_key] = { key: r.periodo_key, ini: r.data_ini, fim: r.data_fim };
-      }
-    });
-    var sel = document.getElementById('estPeriodoSel');
-    var selFiltro = document.getElementById('cruzPeriodoFiltro');
-    var cur = sel ? sel.value : '';
-    var opts = '<option value="">— Selecione período —</option>';
-    var optsFiltro = '<option value="">Período mais recente</option>';
-    Object.values(periodos).reverse().forEach(function(p) {
-      var label = p.key;
-      opts      += '<option value="' + p.key + '"' + (p.key === cur ? ' selected' : '') + '>' + label + '</option>';
-      optsFiltro += '<option value="' + p.key + '">' + label + '</option>';
-    });
-    if (sel)      sel.innerHTML      = opts;
-    if (selFiltro) selFiltro.innerHTML = optsFiltro;
-  } catch(e) {
-    console.warn('Erro ao carregar períodos:', e);
-  }
-}
+// ════════════════════════════════════════════════════════════════
+//  SALVAR CONSUMO SHAREPOINT
+// ════════════════════════════════════════════════════════════════
+async function salvarSpt() {
+  var dataIso = document.getElementById('sptData').value;
+  if (!dataIso) { showToast('Informe a data', 'error'); return; }
 
-// ────────────────────────────────────────────────────────────────
-//  Carregar dados de estoque de um período e preencher formulário
-// ────────────────────────────────────────────────────────────────
-async function carregarEstoquePeriodo() {
-  var periodoKey = document.getElementById('estPeriodoSel').value;
-  // Limpar campos
-  QUIMICOS_EST.forEach(function(q) {
-    var ini = document.getElementById('est_ini_' + q.key);
-    var fin = document.getElementById('est_fin_' + q.key);
-    var obs = document.getElementById('est_obs_' + q.key);
-    if (ini) ini.value = '';
-    if (fin) fin.value = '';
-    if (obs) obs.value = '';
-  });
-  document.getElementById('estDataIni').value = '';
-  document.getElementById('estDataFim').value = '';
-  document.getElementById('estObs').value = '';
-
-  if (!periodoKey) return;
-
-  try {
-    setLoading(true);
-    var rows = await sbGet('ete_estoques', '&periodo_key=eq.' + encodeURIComponent(periodoKey));
-    if (!rows || !rows.length) { setLoading(false); return; }
-
-    // Preencher datas e obs geral do primeiro registro
-    var primeiro = rows[0];
-    if (primeiro.data_ini) document.getElementById('estDataIni').value = primeiro.data_ini;
-    if (primeiro.data_fim) document.getElementById('estDataFim').value = primeiro.data_fim;
-    if (primeiro.obs_geral) document.getElementById('estObs').value = primeiro.obs_geral;
-
-    // Preencher linhas
-    rows.forEach(function(r) {
-      var ini = document.getElementById('est_ini_' + r.quimico);
-      var fin = document.getElementById('est_fin_' + r.quimico);
-      var obs = document.getElementById('est_obs_' + r.quimico);
-      if (ini) ini.value = r.est_inicial !== null ? r.est_inicial : '';
-      if (fin) fin.value = r.est_final   !== null ? r.est_final   : '';
-      if (obs) obs.value = r.obs_especifica || '';
-    });
-    showToast('Período ' + periodoKey + ' carregado');
-  } catch(e) {
-    showToast('Erro ao carregar período: ' + e.message, 'error');
-  }
-  setLoading(false);
-}
-
-// ────────────────────────────────────────────────────────────────
-//  Salvar estoque no Supabase
-// ────────────────────────────────────────────────────────────────
-async function salvarEstoque() {
-  var dataIni = document.getElementById('estDataIni').value;
-  var dataFim = document.getElementById('estDataFim').value;
-  var obsGeral = document.getElementById('estObs').value.trim();
-
-  if (!dataIni || !dataFim) {
-    showToast('Informe a data inicial e final do período', 'error');
-    return;
-  }
-  if (dataIni > dataFim) {
-    showToast('Data inicial não pode ser maior que a final', 'error');
-    return;
-  }
-
-  // Gerar chave do período no formato DD/MM_DD/MM
-  function fmtDtKey(iso) {
-    var p = iso.split('-');
-    return p[2] + '/' + p[1];
-  }
-  var periodoKey = fmtDtKey(dataIni) + '_' + fmtDtKey(dataFim);
-
-  // Montar payloads — um registro por químico
-  var payloads = QUIMICOS_EST.map(function(q) {
-    var iniEl = document.getElementById('est_ini_' + q.key);
-    var finEl = document.getElementById('est_fin_' + q.key);
-    var obsEl = document.getElementById('est_obs_' + q.key);
-    return {
-      periodo_key:    periodoKey,
-      data_ini:       dataIni,
-      data_fim:       dataFim,
-      quimico:        q.key,
-      unidade:        q.unidade,
-      est_inicial:    iniEl && iniEl.value !== '' ? parseFloat(iniEl.value) : null,
-      est_final:      finEl && finEl.value !== '' ? parseFloat(finEl.value) : null,
-      obs_geral:      obsGeral,
-      obs_especifica: obsEl ? obsEl.value.trim() : ''
-    };
-  });
-
-  // Verificar se período já existe — se sim, apaga antes de reinserir
-  try {
-    setLoading(true);
-    var existing = await sbGet('ete_estoques', '&periodo_key=eq.' + encodeURIComponent(periodoKey) + '&select=id');
-    if (existing && existing.length) {
-      // Excluir registros existentes deste período
-      for (var i = 0; i < existing.length; i++) {
-        await sbDelete('ete_estoques', existing[i].id);
-      }
+  var payloads = [];
+  SPT_QUIMICOS.forEach(function(q) {
+    var el = document.getElementById('spt_val_' + q.campo);
+    var val = el && el.value !== '' ? parseFloat(el.value) : null;
+    if (val !== null) {
+      payloads.push({ data_iso: dataIso, campo: q.campo, valor: val });
     }
-    // Inserir todos os registros do período
-    await sbInsert('ete_estoques', payloads);
+  });
 
-    showToast('Estoque do período ' + periodoKey + ' salvo (' + payloads.length + ' químicos)');
-    await carregarPeriodosEstoque();
+  if (!payloads.length) { showToast('Nenhum valor informado', 'error'); return; }
 
-    // Atualizar o select para o período recém salvo
-    var sel = document.getElementById('estPeriodoSel');
-    if (sel) sel.value = periodoKey;
-
-    // Recalcular cruzamento
-    await renderCruzamentoSupabase();
+  try {
+    setLoading(true);
+    // Deletar registros existentes dessa data antes de reinserir
+    var existing = await sbGet('ete_spt', '&data_iso=eq.' + dataIso + '&select=id');
+    for (var i = 0; i < (existing || []).length; i++) {
+      await sbDelete('ete_spt', existing[i].id);
+    }
+    await sbInsert('ete_spt', payloads);
+    showToast('SharePoint do dia ' + dataIso.split('-').reverse().join('/') + ' salvo (' + payloads.length + ' químicos)');
+    await carregarSptData();
+    renderSptComparativo();
   } catch(e) {
-    showToast('Erro ao salvar estoque: ' + e.message, 'error');
+    showToast('Erro ao salvar: ' + e.message, 'error');
     console.error(e);
   }
   setLoading(false);
 }
 
-// ────────────────────────────────────────────────────────────────
-//  Excluir período de estoque
-// ────────────────────────────────────────────────────────────────
-async function excluirEstoquePeriodo() {
-  var periodoKey = document.getElementById('cruzPeriodoFiltro').value;
-  var label = periodoKey || 'o período mais recente';
-  if (!confirm('Excluir estoque de ' + label + '? Esta ação não pode ser desfeita.')) return;
-
+// ════════════════════════════════════════════════════════════════
+//  CARREGAR DADOS DO SHAREPOINT DO SUPABASE
+// ════════════════════════════════════════════════════════════════
+async function carregarSptData() {
   try {
-    setLoading(true);
-    var rows = [];
-    if (periodoKey) {
-      rows = await sbGet('ete_estoques', '&periodo_key=eq.' + encodeURIComponent(periodoKey) + '&select=id');
-    } else {
-      // Pegar o mais recente
-      var all = await sbGet('ete_estoques', '&select=id,periodo_key&order=created_at.desc&limit=7');
-      if (all && all.length) {
-        var firstKey = all[0].periodo_key;
-        rows = all.filter(function(r) { return r.periodo_key === firstKey; });
-      }
-    }
-    for (var i = 0; i < rows.length; i++) {
-      await sbDelete('ete_estoques', rows[i].id);
-    }
-    showToast('Período excluído');
-    await carregarPeriodosEstoque();
-    await renderCruzamentoSupabase();
+    var rows = await sbGet('ete_spt');
+    sptData = rows || [];
   } catch(e) {
-    showToast('Erro ao excluir: ' + e.message, 'error');
-  }
-  setLoading(false);
-}
-
-// ────────────────────────────────────────────────────────────────
-//  Calcular e renderizar cruzamento estoque × consumo (Supabase)
-// ────────────────────────────────────────────────────────────────
-async function renderCruzamentoSupabase() {
-  var periodoKey = document.getElementById('cruzPeriodoFiltro').value;
-
-  try {
-    var rows = [];
-    if (periodoKey) {
-      rows = await sbGet('ete_estoques', '&periodo_key=eq.' + encodeURIComponent(periodoKey));
-    } else {
-      // Buscar o período mais recente
-      var all = await sbGet('ete_estoques', '&order=created_at.desc');
-      if (all && all.length) {
-        var firstKey = all[0].periodo_key;
-        rows = all.filter(function(r) { return r.periodo_key === firstKey; });
-      }
-    }
-
-    if (!rows || !rows.length) {
-      document.getElementById('cruzGrid').innerHTML =
-        '<div style="padding:24px;color:var(--text-muted);font-size:0.85rem;">Nenhum estoque lançado ainda. Use o formulário acima para registrar.</div>';
-      document.getElementById('cruzPeriodoLabel').textContent = '';
-      cruzamentoData = [];
-      renderCruzamento();
-      return;
-    }
-
-    var periodoLabel = rows[0].periodo_key;
-    var dataIni = rows[0].data_ini;
-    var dataFim = rows[0].data_fim;
-    document.getElementById('cruzPeriodoLabel').textContent = 'Período: ' + periodoLabel +
-      (dataIni ? ' · ' + dataIni.split('-').reverse().join('/') + ' → ' + dataFim.split('-').reverse().join('/') : '');
-
-    // Filtrar consumo pelo período de datas
-    function dateOrdIso(iso) {
-      if (!iso) return 0;
-      var p = iso.split('-');
-      return Number(p[0]) * 10000 + Number(p[1]) * 100 + Number(p[2]);
-    }
-    var ordIni = dataIni ? dateOrdIso(dataIni) : 0;
-    var ordFim = dataFim ? dateOrdIso(dataFim) : 99999999;
-
-    function dataBrToIso(br) {
-      // br = "DD/MM"  → monta ISO com ano corrente para comparação
-      if (!br) return null;
-      var p = br.split('/');
-      if (p.length < 2) return null;
-      var ano = new Date().getFullYear();
-      return ano + '-' + p[1].padStart(2, '0') + '-' + p[0].padStart(2, '0');
-    }
-
-    var consumoPeriodo = consumoData.filter(function(r) {
-      var iso = dataBrToIso(r.data);
-      if (!iso) return false;
-      var ord = dateOrdIso(iso);
-      return ord >= ordIni && ord <= ordFim;
-    });
-
-    // Montar cruzamentoData
-    cruzamentoData = rows.map(function(r) {
-      var quimico = r.quimico;
-      var campoCons = EST_CONSUMO_MAP[quimico];
-      var consumoAcum = campoCons ? sumField(consumoPeriodo, campoCons) : null;
-      var variacao = (r.est_inicial !== null && r.est_final !== null) ? (r.est_inicial - r.est_final) : null;
-      var divergencia = (variacao !== null && consumoAcum !== null) ? Math.abs(variacao - consumoAcum) : null;
-      var status = 'sem-dados';
-      if (divergencia !== null) {
-        if (divergencia <= 50)        status = 'ok';
-        else if (divergencia <= 200)  status = 'alerta';
-        else                          status = 'divergencia';
-      }
-      var meta = QUIMICOS_EST.find(function(m) { return m.key === quimico; }) || {};
-      return {
-        quimico:          meta.label || quimico,
-        unidade:          r.unidade || meta.unidade || 'kg',
-        estoqueInicial:   r.est_inicial,
-        estoqueFinal:     r.est_final,
-        consumoAcumulado: consumoAcum,
-        variacao:         variacao,
-        divergencia:      divergencia,
-        status:           status,
-        obs:              r.obs_especifica || ''
-      };
-    });
-
-    renderCruzamento();
-
-    // Renderizar tabela histórico
-    renderHistoricoEstoque(rows);
-
-  } catch(e) {
-    console.error('Erro ao renderizar cruzamento:', e);
-    showToast('Erro ao carregar cruzamento: ' + e.message, 'error');
+    sptData = [];
+    console.warn('ete_spt não encontrada ainda:', e.message);
   }
 }
 
-// ────────────────────────────────────────────────────────────────
-//  Tabela histórico de estoques
-// ────────────────────────────────────────────────────────────────
-function renderHistoricoEstoque(rows) {
-  var tbody = document.getElementById('histEstoqueBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-
-  // Calcular consumo para cada linha
-  var dataIni = rows[0] ? rows[0].data_ini : null;
-  var dataFim = rows[0] ? rows[0].data_fim : null;
-
-  function dataBrToIso2(br) {
-    if (!br) return null;
-    var p = br.split('/');
+// ════════════════════════════════════════════════════════════════
+//  POPULAR FILTROS DE DATA DO COMPARATIVO
+// ════════════════════════════════════════════════════════════════
+function buildSptFiltros() {
+  var datas = [...new Set(consumoData.map(function(r) {
+    // Converter DD/MM para YYYY-MM-DD para ordenar
+    var p = r.data.split('/');
     if (p.length < 2) return null;
     return new Date().getFullYear() + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0');
-  }
-  function dateOrdIso2(iso) {
-    if (!iso) return 0;
-    var p = iso.split('-');
-    return Number(p[0])*10000+Number(p[1])*100+Number(p[2]);
-  }
-  var ordIni = dataIni ? dateOrdIso2(dataIni) : 0;
-  var ordFim = dataFim ? dateOrdIso2(dataFim) : 99999999;
-  var consumoPer = consumoData.filter(function(r) {
-    var iso = dataBrToIso2(r.data);
-    if (!iso) return false;
-    var ord = dateOrdIso2(iso);
-    return ord >= ordIni && ord <= ordFim;
+  }).filter(Boolean))].sort();
+
+  var opts = '<option value="">De</option>' + datas.map(function(d) {
+    var label = d.split('-').reverse().join('/');
+    return '<option value="' + d + '">' + label + '</option>';
+  }).join('');
+  var optsF = '<option value="">Até</option>' + datas.map(function(d) {
+    var label = d.split('-').reverse().join('/');
+    return '<option value="' + d + '">' + label + '</option>';
+  }).join('');
+
+  var elIni = document.getElementById('sptFiltroIni');
+  var elFim = document.getElementById('sptFiltroFim');
+  if (elIni) elIni.innerHTML = opts;
+  if (elFim) elFim.innerHTML = optsF;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RENDERIZAR COMPARATIVO SHAREPOINT
+// ════════════════════════════════════════════════════════════════
+function renderSptComparativo() {
+  var campo = document.getElementById('sptQuimicoFiltro') ? document.getElementById('sptQuimicoFiltro').value : 'acido';
+  var filtroIni = document.getElementById('sptFiltroIni') ? document.getElementById('sptFiltroIni').value : '';
+  var filtroFim = document.getElementById('sptFiltroFim') ? document.getElementById('sptFiltroFim').value : '';
+
+  var meta = SPT_QUIMICOS.find(function(q) { return q.campo === campo; }) || SPT_QUIMICOS[0];
+
+  // Atualizar título
+  var titleEl = document.getElementById('sptChartTitle');
+  if (titleEl) titleEl.textContent = meta.label + ': Operadores vs SharePoint';
+
+  // Obter preço unitário
+  var precoEl = document.getElementById(meta.precoId);
+  var precoUnit = precoEl ? (parseFloat(precoEl.value) || 0) : 0;
+
+  // Montar mapa spt por data_iso → valor
+  var sptMap = {};
+  sptData.forEach(function(r) {
+    if (r.campo === campo) sptMap[r.data_iso] = r.valor;
   });
 
-  var statusMap = { ok: 'ok', alerta: 'alerta', divergencia: 'divergencia', 'sem-dados': 'sem-dados' };
-  var statusLabel = { ok: '✓ OK', alerta: '⚠ Alerta', divergencia: '✕ Divergência', 'sem-dados': '— Sem dados' };
+  // Converter consumoData DD/MM → ISO, somar por dia para o campo selecionado
+  var opMap = {};
+  consumoData.forEach(function(r) {
+    var p = r.data.split('/');
+    if (p.length < 2) return;
+    var iso = new Date().getFullYear() + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0');
+    opMap[iso] = (opMap[iso] || 0) + (r[campo] || 0);
+  });
 
-  rows.forEach(function(r) {
-    var meta   = QUIMICOS_EST.find(function(m) { return m.key === r.quimico; }) || {};
-    var campo  = EST_CONSUMO_MAP[r.quimico];
-    var cons   = campo ? sumField(consumoPer, campo) : null;
-    var variac = (r.est_inicial !== null && r.est_final !== null) ? (r.est_inicial - r.est_final) : null;
-    var div    = (variac !== null && cons !== null) ? Math.abs(variac - cons) : null;
-    var status = 'sem-dados';
-    if (div !== null) { status = div <= 50 ? 'ok' : div <= 200 ? 'alerta' : 'divergencia'; }
+  // União de datas
+  var todasDatas = [...new Set([...Object.keys(opMap), ...Object.keys(sptMap)])].sort();
 
-    var fmt = function(v) { return v !== null && v !== undefined ? v.toLocaleString('pt-BR', {maximumFractionDigits:1}) : '—'; };
+  // Aplicar filtros de data
+  if (filtroIni) todasDatas = todasDatas.filter(function(d) { return d >= filtroIni; });
+  if (filtroFim) todasDatas = todasDatas.filter(function(d) { return d <= filtroFim; });
+
+  // Montar séries
+  var labels = todasDatas.map(function(d) { return d.split('-').reverse().slice(0,2).join('/'); });
+  var serieOp  = todasDatas.map(function(d) { return opMap[d]  !== undefined ? opMap[d]  : null; });
+  var serieSpt = todasDatas.map(function(d) { return sptMap[d] !== undefined ? sptMap[d] : null; });
+
+  // KPIs
+  var totalOp = 0, totalSpt = 0, diasDiv = 0, custoTotalDif = 0;
+  var diasComAmbos = todasDatas.filter(function(d) { return opMap[d] !== undefined && sptMap[d] !== undefined; });
+  diasComAmbos.forEach(function(d) {
+    var dif = Math.abs((sptMap[d] || 0) - (opMap[d] || 0));
+    totalOp  += opMap[d]  || 0;
+    totalSpt += sptMap[d] || 0;
+    if (dif > 0) diasDiv++;
+    custoTotalDif += dif * precoUnit;
+  });
+  var difTotal = totalSpt - totalOp;
+
+  var kpisEl = document.getElementById('sptKpis');
+  if (kpisEl) {
+    var fmtN = function(v) { return v.toLocaleString('pt-BR', {maximumFractionDigits:1}); };
+    var fmtR = function(v) { return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2}); };
+    kpisEl.innerHTML =
+      '<div class="kpi-card"><div class="kpi-label">Total Op. (WhatsApp)</div><div class="kpi-val" style="color:#0fa899">' + fmtN(totalOp) + ' ' + meta.unidade + '</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">Total SharePoint</div><div class="kpi-val" style="color:#2471e8">' + fmtN(totalSpt) + ' ' + meta.unidade + '</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">Diferença acumulada</div><div class="kpi-val" style="color:' + (Math.abs(difTotal) > 0 ? '#e04535' : 'var(--green-light)') + '">' + (difTotal > 0 ? '+' : '') + fmtN(difTotal) + ' ' + meta.unidade + '</div></div>' +
+      '<div class="kpi-card"><div class="kpi-label">💸 Custo da divergência</div><div class="kpi-val" style="color:' + (custoTotalDif > 0 ? '#e04535' : 'var(--green-light)') + '">' + fmtR(custoTotalDif) + '</div></div>';
+  }
+
+  // Gráfico
+  destroyChart('chartSpt');
+  if (todasDatas.length > 0) {
+    charts['chartSpt'] = new Chart(document.getElementById('chartSpt'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Operadores (WhatsApp)',
+            data: serieOp,
+            borderColor: '#0fa899',
+            backgroundColor: 'rgba(15,168,153,0.08)',
+            pointBackgroundColor: '#0fa899',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            borderWidth: 2.5,
+            fill: false,
+            tension: 0.3,
+            spanGaps: true
+          },
+          {
+            label: 'SharePoint',
+            data: serieSpt,
+            borderColor: '#2471e8',
+            backgroundColor: 'rgba(36,113,232,0.08)',
+            pointBackgroundColor: '#2471e8',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            borderWidth: 2.5,
+            fill: false,
+            tension: 0.3,
+            spanGaps: true,
+            borderDash: [5, 3]
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#6b7897', font: { size: 11 }, boxWidth: 10, padding: 14 } },
+          tooltip: {
+            callbacks: {
+              afterBody: function(items) {
+                var opV = null, spV = null;
+                items.forEach(function(item) {
+                  if (item.datasetIndex === 0) opV = item.parsed.y;
+                  if (item.datasetIndex === 1) spV = item.parsed.y;
+                });
+                if (opV !== null && spV !== null) {
+                  var dif = spV - opV;
+                  var custo = Math.abs(dif) * precoUnit;
+                  return [
+                    'Diferença: ' + (dif > 0 ? '+' : '') + dif.toFixed(1) + ' ' + meta.unidade,
+                    precoUnit > 0 ? '💸 Custo: R$ ' + custo.toLocaleString('pt-BR', {minimumFractionDigits:2}) : ''
+                  ].filter(Boolean);
+                }
+                return '';
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#6b7897', font: { size: 10 }, maxRotation: 45 } },
+          y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 11 } } }
+        }
+      }
+    });
+  }
+
+  // Tabela de detalhe
+  var tbody = document.getElementById('sptDetalheBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  var fmtN = function(v) { return v !== null && v !== undefined ? v.toLocaleString('pt-BR', {maximumFractionDigits:1}) : '—'; };
+  var fmtR2 = function(v) { return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2}); };
+
+  var custoAcum = 0;
+  todasDatas.forEach(function(d) {
+    var opV  = opMap[d]  !== undefined ? opMap[d]  : null;
+    var spV  = sptMap[d] !== undefined ? sptMap[d] : null;
+    var dif  = (opV !== null && spV !== null) ? (spV - opV) : null;
+    var custo = (dif !== null && precoUnit > 0) ? Math.abs(dif) * precoUnit : null;
+    if (custo) custoAcum += custo;
+
+    var status = dif === null ? 'sem-dados' : Math.abs(dif) <= 0 ? 'ok' : Math.abs(dif) <= 50 ? 'alerta' : 'divergencia';
+    var statusLabel = { ok: '✓ OK', alerta: '⚠ Alerta', divergencia: '✕ Diverge', 'sem-dados': '— Sem SP' };
+    var label = d.split('-').reverse().join('/');
+
     var tr = document.createElement('tr');
     tr.innerHTML =
-      '<td><span style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:0.8rem;">' + r.periodo_key + '</span></td>' +
-      '<td><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:' + (meta.cor||'#ccc') + ';display:inline-block"></span>' + (meta.label||r.quimico) + '</span></td>' +
-      '<td style="text-align:right">' + fmt(r.est_inicial) + '</td>' +
-      '<td style="text-align:right">' + fmt(r.est_final)   + '</td>' +
-      '<td style="text-align:right">' + (cons !== null ? fmt(cons) : '—') + '</td>' +
-      '<td style="text-align:right;color:' + (div !== null && div > 200 ? 'var(--red-light)' : 'inherit') + '">' + fmt(variac) + '</td>' +
+      '<td><strong>' + label + '</strong></td>' +
+      '<td style="text-align:right;color:#0fa899">' + fmtN(opV) + '</td>' +
+      '<td style="text-align:right;color:#2471e8">' + fmtN(spV) + '</td>' +
+      '<td style="text-align:right;font-weight:600;color:' + (dif !== null && Math.abs(dif) > 50 ? '#e04535' : dif !== null ? 'var(--green-light)' : 'inherit') + '">' +
+        (dif !== null ? (dif > 0 ? '+' : '') + fmtN(dif) : '—') + '</td>' +
+      '<td style="text-align:right;color:' + (custo && custo > 0 ? '#e04535' : 'inherit') + '">' + (custo !== null ? fmtR2(custo) : '—') + '</td>' +
       '<td><span class="hist-badge ' + status + '">' + statusLabel[status] + '</span></td>';
     tbody.appendChild(tr);
   });
+
+  var badge = document.getElementById('sptCustoTotalBadge');
+  if (badge) {
+    if (custoAcum > 0) {
+      badge.style.display = 'block';
+      badge.textContent = '💸 Custo total da divergência: R$ ' + custoAcum.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 }
 
-// ────────────────────────────────────────────────────────────────
-//  Inicializar aba de cruzamento ao abrir
-// ────────────────────────────────────────────────────────────────
-var _cruzTabIniciado = false;
+// ════════════════════════════════════════════════════════════════
+//  INICIALIZAR ABA AO ABRIR
+// ════════════════════════════════════════════════════════════════
+var _sptTabIniciado = false;
 var origSwitchTab = switchTab;
 switchTab = function(id) {
   origSwitchTab(id);
-  if (id === 'cruzamento' && !_cruzTabIniciado) {
-    _cruzTabIniciado = true;
-    iniciarTabelaEstoque();
-    carregarPeriodosEstoque().then(function() {
-      renderCruzamentoSupabase();
+  if (id === 'cruzamento' && !_sptTabIniciado) {
+    _sptTabIniciado = true;
+    iniciarTabelaSpt();
+    buildSptFiltros();
+    carregarSptData().then(function() {
+      renderSptComparativo();
     });
   }
 };
 
 // ── Carregar dados do Supabase ao iniciar
 carregarDados();
+
 </script>
 </body>
 </html>
