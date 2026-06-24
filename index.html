@@ -338,11 +338,11 @@
   <button class="tab-btn" onclick="switchTab('consumo-dia')">Consumo por Dia</button>
   <button class="tab-btn" onclick="switchTab('por-operador')">Por Operador</button>
   <button class="tab-btn" onclick="switchTab('tabela')">Tabela Detalhada</button>
-  <button class="tab-btn" onclick="switchTab('cruzamento')">📊 Comparativo SharePoint</button>
+  <button class="tab-btn" onclick="switchTab('cruzamento')">Comparativo SharePoint</button>
   <button class="tab-btn" onclick="switchTab('custos')">Custos</button>
   <button class="tab-btn" onclick="switchTab('lancamento')">✚ Lançar Consumo</button>
-  <button class="tab-btn" onclick="switchTab('metas')">🎯 Metas / Limites</button>
-  <button class="tab-btn" onclick="switchTab('novo-quimico')">🧪 Novo Químico</button>
+  <button class="tab-btn" onclick="switchTab('metas')">Metas / Limites</button>
+  <button class="tab-btn" onclick="switchTab('novo-quimico')">Novo Quimico</button>
   <button class="tab-btn" onclick="switchTab('apresentacao');initApresentacao()">▶ Apresentação</button>
 </div>
 
@@ -454,7 +454,7 @@
   <div class="card" style="margin-bottom:20px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;">
       <div>
-        <div class="card-title" style="margin-bottom:2px">📋 Lançar Consumo Diário do SharePoint</div>
+        <div class="card-title" style="margin-bottom:2px">Lancamento de Consumo do SharePoint</div>
         <div style="font-size:0.75rem;color:var(--text-muted)">Informe a data e o consumo total do dia (3 turnos) conforme a planilha do SharePoint</div>
       </div>
       <button onclick="salvarSpt()" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:0.82rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;">💾 Salvar</button>
@@ -658,29 +658,41 @@
 
 <!-- METAS / LIMITES -->
 <div class="tab-panel" id="tab-metas">
-  <div style="max-width:900px;">
+  <div style="max-width:960px;">
     <div class="card" style="margin-bottom:20px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
         <div>
-          <div class="card-title" style="margin-bottom:2px;">🎯 Metas Diárias por Químico</div>
-          <div style="font-size:0.75rem;color:var(--text-muted)">Defina a meta/limite diário para cada químico. Cada químico pode ter sua própria meta.</div>
+          <div class="card-title" style="margin-bottom:4px;">Metas Diarias por Quimico</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">Valores salvos no servidor — todos os usuarios verao a mesma meta.</div>
         </div>
-        <button onclick="salvarMetas()" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:0.82rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 5l-6 6-3-3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Salvar Metas
-        </button>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:500;">Alterado por</label>
+            <input type="text" id="metasAlteradoPor" placeholder="Seu nome" style="border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:0.82rem;font-family:DM Sans,sans-serif;background:var(--panel);color:var(--text);outline:none;width:160px;">
+          </div>
+          <button onclick="salvarMetas()" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:9px 20px;font-size:0.82rem;font-family:DM Sans,sans-serif;font-weight:500;cursor:pointer;align-self:flex-end;">Salvar Metas</button>
+        </div>
       </div>
-      <div id="metasGrid" style="margin-top:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;"></div>
-      <div id="metasSavedBadge" style="display:none;margin-top:14px;background:#edfaf8;border:1px solid #b2e8e3;border-radius:8px;padding:10px 16px;font-size:0.8rem;color:var(--teal);align-items:center;gap:8px;">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 5l-6 6-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Metas salvas com sucesso!
-      </div>
+      <div id="metasGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:14px;"></div>
+      <div id="metasStatus" style="display:none;border-radius:8px;padding:10px 16px;font-size:0.82rem;margin-top:4px;"></div>
     </div>
     <div class="card">
-      <div class="card-title" style="margin-bottom:4px;">ℹ Como funcionam as metas</div>
-      <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.7;">
-        <p>• Cada químico tem sua própria meta diária independente.</p>
-        <p>• Para polímeros divididos (ex: meta total 150 kg = 75 Decanter + 75 Flotadores), configure cada tipo separadamente.</p>
-        <p>• A meta aparece como linha de referência nos gráficos de Consumo por Dia.</p>
-        <p>• As metas são salvas localmente no navegador.</p>
+      <div class="card-title" style="margin-bottom:14px;">Historico de Alteracoes</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border);">
+              <th style="padding:8px 12px;text-align:left;color:var(--text-muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.4px;">Quimico</th>
+              <th style="padding:8px 12px;text-align:right;color:var(--text-muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.4px;">Valor Anterior</th>
+              <th style="padding:8px 12px;text-align:right;color:var(--text-muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.4px;">Novo Valor</th>
+              <th style="padding:8px 12px;text-align:left;color:var(--text-muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.4px;">Alterado por</th>
+              <th style="padding:8px 12px;text-align:left;color:var(--text-muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.4px;">Data / Hora</th>
+            </tr>
+          </thead>
+          <tbody id="metasHistoricoBody">
+            <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--text-muted);font-size:0.8rem;">Carregando...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -690,7 +702,7 @@
 <div class="tab-panel" id="tab-novo-quimico">
   <div style="max-width:700px;">
     <div class="card" style="margin-bottom:20px;">
-      <div class="card-title" style="margin-bottom:4px;">🧪 Cadastrar Novo Químico</div>
+      <div class="card-title" style="margin-bottom:4px;">Cadastrar Novo Quimico</div>
       <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:20px;">Adicione um novo produto químico ao sistema. Ele ficará disponível nos próximos lançamentos.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
         <div style="display:flex;flex-direction:column;gap:5px;">
@@ -712,7 +724,10 @@
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;">
           <label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:500;">Cor no dashboard</label>
-          <input type="color" id="nqCor" value="#3b82f6" style="border:1px solid var(--border);border-radius:8px;padding:4px 6px;height:40px;width:100%;cursor:pointer;background:var(--panel);">
+          <div id="nqCorPreview" style="height:40px;border-radius:8px;background:#3b82f6;border:1px solid var(--border);display:flex;align-items:center;padding:0 12px;">
+            <span style="font-size:0.75rem;color:white;font-weight:600;" id="nqCorLabel">Atribuida automaticamente</span>
+          </div>
+          <input type="hidden" id="nqCor" value="#3b82f6">
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;">
           <label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);font-weight:500;">Preço unitário (R$)</label>
@@ -1025,7 +1040,8 @@ async function carregarDados() {
   setLoading(true);
   document.getElementById('lastImport').style.display = 'none';
   try {
-    var rows = await sbGet('ete_consumo');
+    await carregarMetas();
+  var rows = await sbGet('ete_consumo');
     if (!rows || rows.length === 0) {
       showToast('Nenhum dado no banco ainda. Importe uma planilha ou faça um lançamento.', 'error');
       setLoading(false);
@@ -2138,14 +2154,56 @@ function initDashboard() {
 //  METAS / LIMITES — renderizar e salvar
 // ════════════════════════════════════════════════════════════════
 var METAS_LABELS = {
-  acido:    { label: 'Ácido Sulfúrico', cor: '#e04535' },
-  acidoRec: { label: 'Ácido Nítrico',   cor: '#e8700e' },
-  soda:     { label: 'Soda',            cor: '#2471e8' },
-  pac:      { label: 'PAC (Parque)',    cor: '#0fa899' },
-  polDec:   { label: 'Pol. Decanter',  cor: '#8b5cf6' },
-  polFlot:  { label: 'Pol. Flotadores',cor: '#d4920f' },
-  anti:     { label: 'Antiespumante',  cor: '#7a8499' }
+  acido:    { label: 'Acido Sulfurico',  cor: '#e04535' },
+  acidoRec: { label: 'Acido Nitrico',    cor: '#e8700e' },
+  soda:     { label: 'Soda',             cor: '#2471e8' },
+  pac:      { label: 'PAC / Parque',     cor: '#0fa899' },
+  polDec:   { label: 'Pol. Decanter',    cor: '#8b5cf6' },
+  polFlot:  { label: 'Pol. Flotadores',  cor: '#d4920f' },
+  anti:     { label: 'Antiespumante',    cor: '#7a8499' }
 };
+
+// ── carregarMetas: busca do Supabase e popula metasConfig
+async function carregarMetas() {
+  try {
+    var rows = await sbGet('ete_metas');
+    if (rows && rows.length) {
+      rows.forEach(function(r) { metasConfig[r.campo] = r.valor; });
+    }
+  } catch(e) { console.warn('carregarMetas:', e.message); }
+}
+
+// ── carregarHistoricoMetas: lista as ultimas 50 alteracoes
+async function carregarHistoricoMetas() {
+  var tbody = document.getElementById('metasHistoricoBody');
+  if (!tbody) return;
+  try {
+    var url = SUPABASE_URL + '/rest/v1/ete_metas_historico?order=alterado_em.desc&limit=50';
+    var r = await fetch(url, { headers: sbHeaders() });
+    var rows = await r.json();
+    if (!rows || !rows.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--text-muted);font-size:0.8rem;">Nenhuma alteracao registrada ainda.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(function(row) {
+      var dt = new Date(row.alterado_em);
+      var dtStr = dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      var ml = METAS_LABELS[row.campo] || { label: row.campo, cor: '#7a8499' };
+      var ant = row.valor_anterior !== null ? row.valor_anterior.toLocaleString('pt-BR') + ' kg' : '—';
+      return '<tr style="border-bottom:1px solid var(--border);">' +
+        '<td style="padding:9px 12px;"><span style="display:inline-flex;align-items:center;gap:7px;">' +
+          '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + ml.cor + ';flex-shrink:0;"></span>' +
+          '<strong>' + ml.label + '</strong></span></td>' +
+        '<td style="padding:9px 12px;text-align:right;color:var(--text-muted);">' + ant + '</td>' +
+        '<td style="padding:9px 12px;text-align:right;font-family:Syne,sans-serif;font-weight:700;color:' + ml.cor + ';">' + row.valor_novo.toLocaleString('pt-BR') + ' kg</td>' +
+        '<td style="padding:9px 12px;color:var(--text-muted);">' + (row.alterado_por || '—') + '</td>' +
+        '<td style="padding:9px 12px;color:var(--text-muted);font-size:0.75rem;">' + dtStr + '</td>' +
+        '</tr>';
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:16px;color:var(--text-muted);">Erro ao carregar historico.</td></tr>';
+  }
+}
 
 function renderMetasGrid() {
   var grid = document.getElementById('metasGrid');
@@ -2161,29 +2219,60 @@ function renderMetasGrid() {
         '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + ml.cor + ';flex-shrink:0;"></span>' +
         '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:0.88rem;color:var(--text);">' + ml.label + '</span>' +
       '</div>' +
-      '<div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Meta diária (kg/dia)</div>' +
+      '<div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Meta diaria (kg/dia)</div>' +
       '<div style="display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--panel);">' +
         '<input type="number" id="meta_' + campo + '" min="0" step="1" value="' + val + '" ' +
           'style="border:none;outline:none;padding:8px 12px;font-size:0.95rem;font-family:Syne,sans-serif;font-weight:800;color:' + ml.cor + ';width:100%;background:transparent;">' +
         '<span style="padding:8px 10px;background:var(--panel2);font-size:0.75rem;color:var(--text-muted);border-left:1px solid var(--border);">kg</span>' +
       '</div>' +
       (campo === 'polDec' || campo === 'polFlot' ?
-        '<div style="font-size:0.68rem;color:var(--text-muted);margin-top:6px;">💡 Ex: meta total 150 kg → 75 Decanter + 75 Flotadores</div>' : '');
+        '<div style="font-size:0.68rem;color:var(--text-muted);margin-top:6px;">Ex: meta total 150 kg = 75 Decanter + 75 Flotadores</div>' : '');
     grid.appendChild(div);
   });
 }
 
-function salvarMetas() {
-  var novas = {};
+async function salvarMetas() {
+  var alteradoPor = (document.getElementById('metasAlteradoPor') ? document.getElementById('metasAlteradoPor').value.trim() : '') || 'sistema';
+  var status = document.getElementById('metasStatus');
+
+  var alteracoes = [];
   Object.keys(METAS_LABELS).forEach(function(campo) {
     var el = document.getElementById('meta_' + campo);
-    if (el) novas[campo] = parseFloat(el.value) || 0;
+    if (!el) return;
+    var novoValor = parseFloat(el.value) || 0;
+    var valorAnterior = getMeta(campo);
+    if (novoValor !== valorAnterior) alteracoes.push({ campo: campo, valor_novo: novoValor, valor_anterior: valorAnterior });
   });
-  metasConfig = novas;
-  saveMetas(novas);
-  var badge = document.getElementById('metasSavedBadge');
-  if (badge) { badge.style.display = 'flex'; setTimeout(function() { badge.style.display = 'none'; }, 3000); }
-  showToast('Metas salvas com sucesso!');
+
+  if (!alteracoes.length) {
+    if (status) { status.style.display='block'; status.style.background='#fff8e1'; status.style.border='1px solid #ffe082'; status.style.color='#7a5800'; status.textContent='Nenhuma meta foi alterada.'; setTimeout(function(){status.style.display='none';},3000); }
+    return;
+  }
+
+  setLoading(true);
+  try {
+    for (var j = 0; j < alteracoes.length; j++) {
+      var alt = alteracoes[j];
+      var r = await fetch(SUPABASE_URL + '/rest/v1/ete_metas?campo=eq.' + alt.campo, {
+        method: 'PATCH',
+        headers: Object.assign({ 'Prefer': 'return=representation' }, sbHeaders()),
+        body: JSON.stringify({ valor: alt.valor_novo, atualizado_em: new Date().toISOString(), atualizado_por: alteradoPor })
+      });
+      if (!r.ok) throw new Error('Erro ao atualizar ' + alt.campo);
+      await sbInsert('ete_metas_historico', {
+        campo: alt.campo, valor_novo: alt.valor_novo, valor_anterior: alt.valor_anterior,
+        alterado_por: alteradoPor, alterado_em: new Date().toISOString()
+      });
+      metasConfig[alt.campo] = alt.valor_novo;
+    }
+    if (status) { status.style.display='block'; status.style.background='#edfaf8'; status.style.border='1px solid #b2e8e3'; status.style.color='var(--teal)'; status.textContent=alteracoes.length + ' meta(s) atualizada(s). Todos os usuarios verao os novos valores.'; setTimeout(function(){status.style.display='none';},5000); }
+    showToast('Metas salvas no servidor!');
+    carregarHistoricoMetas();
+  } catch(e) {
+    if (status) { status.style.display='block'; status.style.background='#fdecea'; status.style.border='1px solid #f5c6cb'; status.style.color='#c0392b'; status.textContent='Erro: ' + e.message; }
+    showToast('Erro ao salvar metas', 'error');
+  }
+  setLoading(false);
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -2229,11 +2318,37 @@ function renderListaQuimicos() {
   });
 }
 
+var AUTO_CORES_PALETTE = [
+  '#e04535','#e8700e','#2471e8','#0fa899','#8b5cf6','#d4920f','#7a8499',
+  '#16a34a','#db2777','#0891b2','#7c3aed','#b45309','#4f46e5','#be123c',
+  '#0f766e','#a16207','#1d4ed8','#9333ea','#065f46','#9f1239'
+];
+
+function proximaCorAuto() {
+  var usadas = ['#e04535','#e8700e','#2471e8','#0fa899','#8b5cf6','#d4920f','#7a8499'];
+  var custom = loadCustomQuimicos();
+  custom.forEach(function(q) { if (q.cor) usadas.push(q.cor.toLowerCase()); });
+  for (var i = 0; i < AUTO_CORES_PALETTE.length; i++) {
+    if (!usadas.includes(AUTO_CORES_PALETTE[i])) return AUTO_CORES_PALETTE[i];
+  }
+  return AUTO_CORES_PALETTE[usadas.length % AUTO_CORES_PALETTE.length];
+}
+
+// Atualizar preview de cor ao digitar o identificador
+(function() {
+  var nqNome = document.getElementById('nqNome');
+  if (nqNome) nqNome.addEventListener('input', function() {
+    var cor = proximaCorAuto();
+    var el = document.getElementById('nqCor'); if(el) el.value = cor;
+    var prev = document.getElementById('nqCorPreview'); if(prev) prev.style.background = cor;
+  });
+})();
+
 function cadastrarNovoQuimico() {
   var nome  = (document.getElementById('nqNome').value || '').trim();
   var campo = (document.getElementById('nqCampo').value || '').trim().replace(/\s+/g, '_').toLowerCase();
   var unid  = document.getElementById('nqUnidade').value;
-  var cor   = document.getElementById('nqCor').value;
+  var cor   = proximaCorAuto();
   var preco = parseFloat(document.getElementById('nqPreco').value) || 0;
   var meta  = parseFloat(document.getElementById('nqMeta').value) || 0;
   var obs   = (document.getElementById('nqObs').value || '').trim();
@@ -2245,7 +2360,7 @@ function cadastrarNovoQuimico() {
     feedback.style.background='#fdecea';
     feedback.style.border='1px solid #f5c6cb';
     feedback.style.color='#c0392b';
-    feedback.textContent='⚠ Preencha o nome e o identificador do químico.';
+    feedback.textContent='Preencha o nome e o identificador do quimico.';
     return;
   }
 
@@ -2257,28 +2372,27 @@ function cadastrarNovoQuimico() {
     feedback.style.background='#fdecea';
     feedback.style.border='1px solid #f5c6cb';
     feedback.style.color='#c0392b';
-    feedback.textContent='⚠ Identificador "' + campo + '" já está em uso. Escolha outro.';
+    feedback.textContent='Identificador "' + campo + '" já está em uso. Escolha outro.';
     return;
   }
 
   custom.push({ label: nome, campo: campo, cor: cor, unidade: unid, preco: preco, meta: meta, obs: obs, tipo: 'custom' });
   saveCustomQuimicos(custom);
 
-  // Adicionar meta também
+  // Adicionar meta localmente
   metasConfig[campo] = meta;
-  saveMetas(metasConfig);
   renderMetasGrid();
 
   feedback.style.display='block';
   feedback.style.background='#edfaf8';
   feedback.style.border='1px solid #b2e8e3';
   feedback.style.color='var(--teal)';
-  feedback.textContent='✓ Químico "' + nome + '" cadastrado com sucesso!';
+  feedback.textContent='Quimico "' + nome + '" cadastrado com sucesso!';
 
   limparFormNovoQuimico();
   renderListaQuimicos();
   setTimeout(function() { feedback.style.display='none'; }, 4000);
-  showToast('Químico "' + nome + '" cadastrado!');
+  showToast('Quimico "' + nome + '" cadastrado!');
 }
 
 function removerCustomQuimico(campo) {
@@ -2299,15 +2413,15 @@ function limparFormNovoQuimico() {
 }
 
 // ── Inicializar tabs on switch
-var _metasTabIniciado = false;
+
 var _nqTabIniciado = false;
 var _sptTabIniciado = false;
 var origSwitchTabBase = switchTab;
 switchTab = function(id) {
   origSwitchTabBase(id);
-  if (id === 'metas' && !_metasTabIniciado) {
-    _metasTabIniciado = true;
+  if (id === 'metas') {
     renderMetasGrid();
+    carregarHistoricoMetas();
   }
   if (id === 'novo-quimico' && !_nqTabIniciado) {
     _nqTabIniciado = true;
@@ -2323,14 +2437,8 @@ switchTab = function(id) {
   }
 };
 
-// ── Carregar preços salvos
-// ── Carregar metas salvas
-var savedMetas = loadMetas();
-if (savedMetas) {
-  metasConfig = savedMetas;
-} else {
-  metasConfig = Object.assign({}, METAS_DEFAULT);
-}
+// ── Carregar precos salvos (metas vem do Supabase via carregarDados)
+metasConfig = Object.assign({}, METAS_DEFAULT);
 
 var savedPrecos = loadPrecos();
 if (savedPrecos) {
