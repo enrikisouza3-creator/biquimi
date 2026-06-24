@@ -1288,7 +1288,7 @@ function renderTable() {
       '<td>' + fmt(r.anti) + '</td>' +
       '<td style="font-size:0.75rem;color:var(--text-muted)">' + (r.obs || '—') + '</td>' +
       '<td style="text-align:center;white-space:nowrap;">' +
-        '<button onclick="abrirEdicao('' + r.id + '')" title="Editar" style="background:var(--teal);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;margin-right:4px;">✏ Editar</button>' +
+        '<button onclick="abrirEdicao(\'' + r.id + '\')\" title="Editar" style="background:var(--teal);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;margin-right:4px;">✏ Editar</button>' +
       '</td>';
     tbody.appendChild(tr);
   });
@@ -1334,7 +1334,7 @@ function abrirEdicao(id) {
   var inputsHtml = camposQuim.map(function(c) {
     return '<div style="display:flex;flex-direction:column;gap:4px;">' +
       '<label style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:' + c.cor + ';font-weight:600;">' + c.label + '</label>' +
-      '<input type="number" id="ed_' + c.id + '" min="0" step="0.1" value="' + (r[c.id] || 0) + '" style="border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:0.85rem;font-family:'Syne',sans-serif;font-weight:700;background:var(--panel);color:var(--text);outline:none;width:100%;">' +
+      '<input type="number" id="ed_' + c.id + '" min="0" step="0.1" value="' + (r[c.id] || 0) + '" style="border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:0.85rem;font-family:Syne,sans-serif;font-weight:700;background:var(--panel);color:var(--text);outline:none;width:100%;">' +
       '</div>';
   }).join('');
 
@@ -1342,10 +1342,10 @@ function abrirEdicao(id) {
     '<div style="background:var(--panel);border-radius:14px;padding:24px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.25);">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">' +
         '<div>' +
-          '<div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:var(--text);">✏ Editar Registro</div>' +
+          '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:1.05rem;color:var(--text);">✏ Editar Registro</div>' +
           '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">ID: ' + r.id + '</div>' +
         '</div>' +
-        '<button onclick="document.getElementById('editModal').remove()" style="background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:0.8rem;color:var(--text-muted);">✕ Fechar</button>' +
+        '<button onclick="document.getElementById(\'editModal\').remove()" style="background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:0.8rem;color:var(--text-muted);">✕ Fechar</button>' +
       '</div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">' +
         '<div style="display:flex;flex-direction:column;gap:4px;">' +
@@ -1371,8 +1371,8 @@ function abrirEdicao(id) {
         '<input type="text" id="ed_obs" value="' + (r.obs || '') + '" style="border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:0.85rem;background:var(--panel);color:var(--text);outline:none;">' +
       '</div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
-        '<button onclick="salvarEdicao('' + r.id + '')" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:9px 20px;font-size:0.85rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;">💾 Salvar alterações</button>' +
-        '<button onclick="document.getElementById('editModal').remove()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:9px 16px;font-size:0.85rem;cursor:pointer;">Cancelar</button>' +
+        '<button onclick="salvarEdicao(\'' + r.id + '\')\" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:9px 20px;font-size:0.85rem;font-family:DM Sans,sans-serif;font-weight:500;cursor:pointer;">💾 Salvar alterações</button>' +
+        '<button onclick="document.getElementById(\'editModal\').remove()" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:8px;padding:9px 16px;font-size:0.85rem;cursor:pointer;">Cancelar</button>' +
       '</div>' +
     '</div>';
 
@@ -2159,12 +2159,12 @@ function renderMetasGrid() {
     div.innerHTML =
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">' +
         '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + ml.cor + ';flex-shrink:0;"></span>' +
-        '<span style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;color:var(--text);">' + ml.label + '</span>' +
+        '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:0.88rem;color:var(--text);">' + ml.label + '</span>' +
       '</div>' +
       '<div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Meta diária (kg/dia)</div>' +
       '<div style="display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--panel);">' +
         '<input type="number" id="meta_' + campo + '" min="0" step="1" value="' + val + '" ' +
-          'style="border:none;outline:none;padding:8px 12px;font-size:0.95rem;font-family:'Syne',sans-serif;font-weight:800;color:' + ml.cor + ';width:100%;background:transparent;">' +
+          'style="border:none;outline:none;padding:8px 12px;font-size:0.95rem;font-family:Syne,sans-serif;font-weight:800;color:' + ml.cor + ';width:100%;background:transparent;">' +
         '<span style="padding:8px 10px;background:var(--panel2);font-size:0.75rem;color:var(--text-muted);border-left:1px solid var(--border);">kg</span>' +
       '</div>' +
       (campo === 'polDec' || campo === 'polFlot' ?
@@ -2221,10 +2221,10 @@ function renderListaQuimicos() {
     div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;';
     div.innerHTML =
       '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + q.cor + ';flex-shrink:0;"></span>' +
-      '<span style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;flex:1;">' + q.label + '</span>' +
+      '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:0.88rem;flex:1;">' + q.label + '</span>' +
       '<span style="font-size:0.7rem;color:var(--text-muted);font-family:monospace;">' + q.campo + '</span>' +
       '<span style="font-size:0.68rem;padding:2px 8px;border-radius:20px;background:' + (q.tipo==='padrão'?'rgba(15,168,153,0.1)':'rgba(107,63,160,0.1)') + ';color:' + (q.tipo==='padrão'?'var(--teal-light)':'var(--purple-light)') + ';border:1px solid ' + (q.tipo==='padrão'?'rgba(15,168,153,0.2)':'rgba(107,63,160,0.2)') + ';">' + q.tipo + '</span>' +
-      (q.tipo === 'custom' ? '<button onclick="removerCustomQuimico('' + q.campo + '')" style="background:none;border:none;color:var(--red-light);cursor:pointer;font-size:0.8rem;padding:2px 6px;" title="Remover">✕</button>' : '');
+      (q.tipo === 'custom' ? '<button onclick="removerCustomQuimico(\'' + q.campo + '\')\" style="background:none;border:none;color:var(--red-light);cursor:pointer;font-size:0.8rem;padding:2px 6px;" title="Remover">✕</button>' : '');
     lista.appendChild(div);
   });
 }
