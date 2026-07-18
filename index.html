@@ -662,7 +662,7 @@
     <div class="card" style="margin-bottom:20px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px;">
         <div>
-          <div class="card-title" style="margin-bottom:2px;">🎯 Metas Diárias por Químico</div>
+          <div class="card-title" style="margin-bottom:2px;">Metas Diárias por Químico</div>
           <div style="font-size:0.75rem;color:var(--text-muted)">Defina a meta/limite diário para cada químico. Cada químico pode ter sua própria meta.</div>
         </div>
         <button onclick="salvarMetas()" style="background:var(--teal);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:0.82rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;">
@@ -690,7 +690,7 @@
 <div class="tab-panel" id="tab-novo-quimico">
   <div style="max-width:700px;">
     <div class="card" style="margin-bottom:20px;">
-      <div class="card-title" style="margin-bottom:4px;">🧪 Cadastrar Novo Químico</div>
+      <div class="card-title" style="margin-bottom:4px;"> Cadastrar Novo Químico</div>
       <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:20px;">Adicione um novo produto químico ao sistema. Ele ficará disponível nos próximos lançamentos.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
         <div style="display:flex;flex-direction:column;gap:5px;">
@@ -2526,7 +2526,7 @@ function renderSptComparativo() {
       '<div class="kpi-card"><div class="kpi-label">Total Op. (WhatsApp)</div><div class="kpi-val" style="color:#0fa899">' + fmtN(totalOp) + ' ' + meta.unidade + '</div></div>' +
       '<div class="kpi-card"><div class="kpi-label">Total SharePoint</div><div class="kpi-val" style="color:#2471e8">' + fmtN(totalSpt) + ' ' + meta.unidade + '</div></div>' +
       '<div class="kpi-card"><div class="kpi-label">Diferença acumulada</div><div class="kpi-val" style="color:' + (Math.abs(difTotal) > 0 ? '#e04535' : 'var(--green-light)') + '">' + (difTotal > 0 ? '+' : '') + fmtN(difTotal) + ' ' + meta.unidade + '</div></div>' +
-      '<div class="kpi-card"><div class="kpi-label">💸 Custo da divergência</div><div class="kpi-val" style="color:' + (custoTotalDif > 0 ? '#e04535' : 'var(--green-light)') + '">' + fmtR(custoTotalDif) + '</div></div>';
+      '<div class="kpi-card"><div class="kpi-label">Custo da divergência</div><div class="kpi-val" style="color:' + (custoTotalDif > 0 ? '#e04535' : 'var(--green-light)') + '">' + fmtR(custoTotalDif) + '</div></div>';
   }
 
   // Gráfico
@@ -2584,7 +2584,7 @@ function renderSptComparativo() {
                   var custo = Math.abs(dif) * precoUnit;
                   return [
                     'Diferença: ' + (dif > 0 ? '+' : '') + dif.toFixed(1) + ' ' + meta.unidade,
-                    precoUnit > 0 ? '💸 Custo: R$ ' + custo.toLocaleString('pt-BR', {minimumFractionDigits:2}) : ''
+                    precoUnit > 0 ? 'Custo: R$ ' + custo.toLocaleString('pt-BR', {minimumFractionDigits:2}) : ''
                   ].filter(Boolean);
                 }
                 return '';
@@ -2635,7 +2635,7 @@ function renderSptComparativo() {
   if (badge) {
     if (custoAcum > 0) {
       badge.style.display = 'block';
-      badge.textContent = '💸 Custo total da divergência: R$ ' + custoAcum.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+      badge.textContent = 'Custo total da divergência: R$ ' + custoAcum.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
     } else {
       badge.style.display = 'none';
     }
