@@ -545,6 +545,7 @@
       <div class="preco-item"><label><span style="background:#d4920f"></span> Pol. Flotadores</label><div class="preco-input-wrap"><span class="preco-prefix">R$</span><input class="preco-input" id="precoPolFlot" type="number" min="0" step="0.01" value="12.49" oninput="renderCustos()"><span class="preco-unit">/kg</span></div></div>
       <div class="preco-item"><label><span style="background:#7a8499"></span> Antiespumante</label><div class="preco-input-wrap"><span class="preco-prefix">R$</span><input class="preco-input" id="precoAnti" type="number" min="0" step="0.01" value="14.96" oninput="renderCustos()"><span class="preco-unit">/kg</span></div></div>
     </div>
+    <div class="precos-grid" id="precosExtraGrid" style="margin-top:10px;"></div>
   </div>
   <div class="custos-filtros">
     <div class="fg"><label>Data início</label><select id="custoFiltroDataIni" onchange="renderCustos()"><option value="">Todas</option></select></div>
@@ -1580,7 +1581,7 @@ function resetCustosFiltros() {
 }
 
 function getPrecos() {
-  return {
+  var p = {
     acido:    parseFloat(document.getElementById('precoAcido').value)    || 0,
     acidoRec: parseFloat(document.getElementById('precoAcidoRec').value) || 0,
     soda:     parseFloat(document.getElementById('precoSoda').value)     || 0,
@@ -1589,14 +1590,39 @@ function getPrecos() {
     polFlot:  parseFloat(document.getElementById('precoPolFlot').value)  || 0,
     anti:     parseFloat(document.getElementById('precoAnti').value)     || 0
   };
+  loadCustomQuimicos().forEach(function(c) {
+    var el = document.getElementById('preco_' + c.campo);
+    if (el) p[c.campo] = parseFloat(el.value) || 0;
+  });
+  return p;
+}
+
+function renderPrecosExtras() {
+  var grid = document.getElementById('precosExtraGrid');
+  if (!grid) return;
+  var custom = loadCustomQuimicos();
+  var savedPrecos = loadPrecos() || {};
+  grid.innerHTML = '';
+  custom.forEach(function(c) {
+    var val = savedPrecos[c.campo] !== undefined ? savedPrecos[c.campo] : (c.preco || 0);
+    var item = document.createElement('div');
+    item.className = 'preco-item';
+    item.innerHTML = '<label><span style="background:' + c.cor + '"></span> ' + c.label + '</label>' +
+      '<div class="preco-input-wrap"><span class="preco-prefix">R$</span>' +
+      '<input class="preco-input" id="preco_' + c.campo + '" type="number" min="0" step="0.01" value="' + val + '" oninput="renderCustos()">' +
+      '<span class="preco-unit">/' + (c.unidade || 'kg') + '</span></div>';
+    grid.appendChild(item);
+  });
 }
 
 function renderCustos() {
   if (!consumoData.length) return;
   var p = getPrecos();
   savePrecos(p);
+  var customQuimicos = loadCustomQuimicos();
   var dadosFiltrados = getCustosFiltrados();
   var comCusto = dadosFiltrados.map(function(r) {
+    var custoExtrasTotal = customQuimicos.reduce(function(s, c) { return s + (Number(r[c.campo]) || 0) * (p[c.campo] || 0); }, 0);
     return Object.assign({}, r, {
       custoAcido:    r.acido    * p.acido,
       custoAcidoRec: r.acidoRec * p.acidoRec,
@@ -1605,7 +1631,7 @@ function renderCustos() {
       custoPolDec:   r.polDec   * p.polDec,
       custoPolFlot:  r.polFlot  * p.polFlot,
       custoAnti:     r.anti     * p.anti,
-      custoTotal:    r.acido * p.acido + r.acidoRec * p.acidoRec + r.soda * p.soda + r.pac * p.pac + r.polDec * p.polDec + r.polFlot * p.polFlot + r.anti * p.anti
+      custoTotal:    r.acido * p.acido + r.acidoRec * p.acidoRec + r.soda * p.soda + r.pac * p.pac + r.polDec * p.polDec + r.polFlot * p.polFlot + r.anti * p.anti + custoExtrasTotal
     });
   });
   var totalAcido    = comCusto.reduce(function(s, r) { return s + r.custoAcido; }, 0);
@@ -1615,7 +1641,8 @@ function renderCustos() {
   var totalPolDec   = comCusto.reduce(function(s, r) { return s + r.custoPolDec; }, 0);
   var totalPolFlot  = comCusto.reduce(function(s, r) { return s + r.custoPolFlot; }, 0);
   var totalAnti     = comCusto.reduce(function(s, r) { return s + r.custoAnti; }, 0);
-  var totalGeral    = totalAcido + totalAcidoRec + totalSoda + totalPac + totalPolDec + totalPolFlot + totalAnti;
+  var totalExtras   = customQuimicos.map(function(c) { return { campo: c.campo, label: c.label, cor: c.cor, val: sumField(dadosFiltrados, c.campo) * (p[c.campo] || 0) }; });
+  var totalGeral    = totalAcido + totalAcidoRec + totalSoda + totalPac + totalPolDec + totalPolFlot + totalAnti + totalExtras.reduce(function(s, x) { return s + x.val; }, 0);
   var diasUnicos    = [...new Set(dadosFiltrados.map(function(r) { return r.data; }))].length || 1;
   var mediaDia      = totalGeral / diasUnicos;
 
@@ -1693,7 +1720,8 @@ function renderCustos() {
     { label: 'Pol. Decanter',   val: sumField(dadosFiltrados, 'polDec')   * p.polDec,   cor: COLORS.polDec },
     { label: 'Pol. Flotadores', val: sumField(dadosFiltrados, 'polFlot')  * p.polFlot,  cor: COLORS.polFlot },
     { label: 'Antiespumante',   val: sumField(dadosFiltrados, 'anti')     * p.anti,     cor: COLORS.anti }
-  ].sort(function(a, b) { return b.val - a.val; });
+  ].concat(totalExtras.map(function(x) { return { label: x.label, val: x.val, cor: x.cor }; }))
+   .sort(function(a, b) { return b.val - a.val; });
   destroyChart('chartCustoTodosQuimicos');
   charts['chartCustoTodosQuimicos'] = new Chart(document.getElementById('chartCustoTodosQuimicos'), {
     type: 'bar',
@@ -2739,6 +2767,7 @@ function cadastrarNovoQuimico() {
   custom.push({ label: nome, campo: campo, cor: cor, unidade: unid, preco: preco, meta: meta, obs: obs, tipo: 'custom' });
   saveCustomQuimicos(custom);
   renderExtrasInputs();
+  renderPrecosExtras();
 
   // Adicionar meta também
   metasConfig[campo] = meta;
@@ -2764,6 +2793,7 @@ function removerCustomQuimico(campo) {
   saveCustomQuimicos(custom);
   renderListaQuimicos();
   renderExtrasInputs();
+  renderPrecosExtras();
   initDashboard();
   showToast('Químico removido.');
 }
@@ -2821,6 +2851,7 @@ if (savedPrecos) {
   if (savedPrecos.polFlot  !== undefined) document.getElementById('precoPolFlot').value  = savedPrecos.polFlot;
   if (savedPrecos.anti     !== undefined) document.getElementById('precoAnti').value     = savedPrecos.anti;
 }
+renderPrecosExtras();
 
 // ── Data de hoje no formulário de lançamento
 var lancDataInput = document.getElementById('lancData');
