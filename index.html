@@ -341,7 +341,7 @@
   <button class="tab-btn" onclick="switchTab('cruzamento')">Comparativo SharePoint</button>
   <button class="tab-btn" onclick="switchTab('custos')">Custos</button>
   <button class="tab-btn" onclick="switchTab('lancamento')">Lançar Consumo</button>
-  <button class="tab-btn" onclick="switchTab('reporte-diario')">Relatório Diário</button>
+  <button class="tab-btn" onclick="switchTab('reporte-diario')">📋 Relatório Diário</button>
   <button class="tab-btn" onclick="switchTab('metas')">Metas / Limites</button>
   <button class="tab-btn" onclick="switchTab('novo-quimico')">Novo Químico</button>
   <button class="tab-btn" onclick="switchTab('apresentacao');initApresentacao()">▶ Apresentação</button>
@@ -713,9 +713,11 @@
       <div class="lanc-field"><label>Oxigenação Nitrificação</label><div class="lanc-input-wrap"><input type="number" id="rdOdNitrif" class="lanc-num" step="0.1" placeholder="0"><span class="lanc-unit">mg/l</span></div></div>
       <div class="lanc-field"><label>Tempo rodando c/ Regenerado</label><div class="lanc-input-wrap"><input type="number" id="rdTempoRegen" class="lanc-num" step="0.5" placeholder="0"><span class="lanc-unit">h</span></div></div>
     </div>
+    <div id="rdEditBanner" style="display:none;background:#fff3cd;border:1px solid #ffe08a;color:#8a6100;border-radius:8px;padding:8px 12px;font-size:0.78rem;margin-bottom:10px;">✎ Editando lançamento existente — salve para aplicar as alterações ou cancele.</div>
     <div class="lanc-actions">
-      <button class="btn-lanc-salvar" onclick="salvarReporteDiario()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 5l-6 6-3-3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Salvar Turno</button>
+      <button class="btn-lanc-salvar" id="rdBtnSalvar" onclick="salvarReporteDiario()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 5l-6 6-3-3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Salvar Turno</button>
       <button class="btn-lanc-limpar" onclick="limparFormReporteDiario()">Limpar</button>
+      <button class="btn-lanc-limpar" id="rdBtnCancelar" style="display:none;" onclick="cancelarEdicaoRD()">Cancelar edição</button>
       <div class="lanc-resumo" id="rdResumo">Selecione uma data para ver o saldo do dia.</div>
     </div>
   </div>
@@ -733,7 +735,7 @@
     <div class="card-title" style="margin-bottom:10px;">Lançamentos do dia por turno</div>
     <div style="overflow-x:auto">
       <table>
-        <thead><tr><th>Turno</th><th>Operador</th><th>Ác. Sulfúrico</th><th>Soda</th><th>PAC</th><th>Ác. Nítrico</th><th>Pol. Dec.</th><th>Pol. Flot.</th><th>Antiespum.</th></tr></thead>
+        <thead><tr><th>Turno</th><th>Operador</th><th>Ác. Sulfúrico</th><th>Soda</th><th>PAC</th><th>Ác. Nítrico</th><th>Pol. Dec.</th><th>Pol. Flot.</th><th>Antiespum.</th><th>Ações</th></tr></thead>
         <tbody id="rdTurnosTableBody"></tbody>
       </table>
     </div>
@@ -1868,6 +1870,8 @@ async function salvarLancamento() {
 // ════════════════════════════════════════════════════════════════
 //  RELATÓRIO DIÁRIO — lançamento por turno + saldo do dia
 // ════════════════════════════════════════════════════════════════
+var rdEditingId = null;
+
 function selecionarOpRD(nome) {
   document.querySelectorAll('#rdOperChips .op-chip[data-op]').forEach(function(c) { c.classList.remove('selected'); });
   var chip = document.querySelector('#rdOperChips .op-chip[data-op="' + nome + '"]');
@@ -1908,6 +1912,52 @@ function rdDataStr() {
   return parts[2] + '/' + parts[1];
 }
 
+function editarLancamentoRD(id) {
+  var r = lancamentos.find(function(x) { return x.id === id; });
+  if (!r) { showToast('Registro não encontrado', 'error'); return; }
+  switchTab('reporte-diario');
+  rdEditingId = id;
+
+  // data: o app guarda só dd/mm, então reconstituímos com o ano atual
+  var partes = String(r.data || '').split('/');
+  if (partes.length === 2) {
+    var ano = new Date().getFullYear();
+    var dd = partes[0].padStart(2, '0');
+    var mm = partes[1].padStart(2, '0');
+    document.getElementById('rdData').value = ano + '-' + mm + '-' + dd;
+  }
+  document.getElementById('rdTurno').value = r.turno || 'Noite';
+  document.getElementById('rdOperador').value = r.operador || '';
+  document.querySelectorAll('#rdOperChips .op-chip[data-op]').forEach(function(c) {
+    c.classList.toggle('selected', c.dataset.op === r.operador);
+  });
+
+  var setVal = function(id2, v) { var el = document.getElementById(id2); if (el) el.value = (v || v === 0) ? v : ''; };
+  setVal('rdAcido', r.acido); setVal('rdSoda', r.soda); setVal('rdPac', r.pac);
+  setVal('rdAcidoRec', r.acidoRec); setVal('rdPolDec', r.polDec); setVal('rdPolFlot', r.polFlot); setVal('rdAnti', r.anti);
+  setVal('rdVazao', r.vazao); setVal('rdPhNeut', r.phNeut); setVal('rdPhCoag', r.phCoag);
+  setVal('rdDqoFlot', r.dqoFlot); setVal('rdOdMbbr1', r.odMbbr1); setVal('rdOdMbbr2', r.odMbbr2);
+  setVal('rdHorasParada', r.horasParada); setVal('rdPhMab1', r.phMab1); setVal('rdPhMab2', r.phMab2);
+  setVal('rdOdNitrif', r.odNitrif); setVal('rdTempoRegen', r.tempoRegen);
+  document.querySelectorAll('#rdExtrasGrid [data-campo]').forEach(function(inp) {
+    inp.value = (r[inp.dataset.campo] || r[inp.dataset.campo] === 0) ? r[inp.dataset.campo] : '';
+  });
+
+  document.getElementById('rdEditBanner').style.display = 'block';
+  document.getElementById('rdBtnCancelar').style.display = 'inline-block';
+  document.getElementById('rdBtnSalvar').textContent = 'Salvar Alterações';
+  var card = document.querySelector('#tab-reporte-diario .lanc-form-card');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelarEdicaoRD() {
+  rdEditingId = null;
+  limparFormReporteDiario();
+  document.getElementById('rdEditBanner').style.display = 'none';
+  document.getElementById('rdBtnCancelar').style.display = 'none';
+  document.getElementById('rdBtnSalvar').textContent = 'Salvar Turno';
+}
+
 async function salvarReporteDiario() {
   var dataVal  = document.getElementById('rdData').value;
   var turno    = document.getElementById('rdTurno').value;
@@ -1931,24 +1981,25 @@ async function salvarReporteDiario() {
     od_nitrif: toN('rdOdNitrif'), tempo_regen: toN('rdTempoRegen'),
     extras: extras
   };
+  var isEdit = !!rdEditingId;
   setLoading(true);
   try {
-    var inserted;
+    var saved;
     try {
-      inserted = await sbInsert('ete_consumo', payload);
+      saved = isEdit ? await sbUpdate('ete_consumo', rdEditingId, payload) : await sbInsert('ete_consumo', payload);
     } catch (errCols) {
       if (/column|schema cache|42703|PGRST204/i.test(errCols.message)) {
         var payloadBasico = { data: dataStr, turno: turno, operador: operador,
           acido: payload.acido, soda: payload.soda, pac: payload.pac,
           acido_rec: payload.acido_rec, pol_dec: payload.pol_dec,
           pol_flot: payload.pol_flot, anti: payload.anti, obs: '' };
-        inserted = await sbInsert('ete_consumo', payloadBasico);
+        saved = isEdit ? await sbUpdate('ete_consumo', rdEditingId, payloadBasico) : await sbInsert('ete_consumo', payloadBasico);
         showToast('Salvo, mas parâmetros extras não gravaram — rode a migração SQL no Supabase.', 'error');
       } else {
         throw errCols;
       }
     }
-    var rec = inserted[0];
+    var rec = saved[0];
     var registro = Object.assign({
       id: rec.id, data: rec.data, turno: rec.turno, operador: rec.operador,
       acido: Number(rec.acido)||0, soda: Number(rec.soda)||0, pac: Number(rec.pac)||0,
@@ -1959,13 +2010,21 @@ async function salvarReporteDiario() {
       horasParada: Number(rec.horas_parada)||0, phMab1: Number(rec.ph_mab1)||0, phMab2: Number(rec.ph_mab2)||0,
       odNitrif: Number(rec.od_nitrif)||0, tempoRegen: Number(rec.tempo_regen)||0
     }, rec.extras || extras || {});
-    lancamentos.push(registro);
-    consumoData.push(registro);
+
+    if (isEdit) {
+      var iL = lancamentos.findIndex(function(x) { return x.id === rdEditingId; });
+      if (iL > -1) lancamentos[iL] = registro;
+      var iC = consumoData.findIndex(function(x) { return x.id === rdEditingId; });
+      if (iC > -1) consumoData[iC] = registro;
+    } else {
+      lancamentos.push(registro);
+      consumoData.push(registro);
+    }
     renderLancamentos();
     initDashboard();
-    limparFormReporteDiario();
+    cancelarEdicaoRD();
     atualizarSaldoDia();
-    showToast('Turno ' + turno + ' salvo! · ' + dataStr + ' · ' + operador);
+    showToast((isEdit ? 'Turno atualizado! · ' : 'Turno ' + turno + ' salvo! · ') + dataStr + ' · ' + operador);
   } catch(err) {
     showToast('Erro ao salvar: ' + err.message, 'error');
   }
@@ -2105,7 +2164,9 @@ function atualizarSaldoDia() {
       var tr = document.createElement('tr');
       tr.innerHTML = '<td><strong>' + (r.turno || '—') + '</strong></td><td><span class="op-tag">' + r.operador + '</span></td>' +
         '<td>' + fmt(r.acido) + '</td><td>' + fmt(r.soda) + '</td><td>' + fmt(r.pac) + '</td>' +
-        '<td>' + fmt(r.acidoRec) + '</td><td>' + fmt(r.polDec) + '</td><td>' + fmt(r.polFlot) + '</td><td>' + fmt(r.anti) + '</td>';
+        '<td>' + fmt(r.acidoRec) + '</td><td>' + fmt(r.polDec) + '</td><td>' + fmt(r.polFlot) + '</td><td>' + fmt(r.anti) + '</td>' +
+        '<td style="white-space:nowrap;"><button class="lanc-del-btn" style="background:var(--blue);margin-right:4px;" title="Editar" onclick="editarLancamentoRD(' + r.id + ')">✎</button>' +
+        '<button class="lanc-del-btn" title="Excluir" onclick="deletarLancamento(' + r.id + ')">✕</button></td>';
       tbody.appendChild(tr);
     });
   }
@@ -2137,8 +2198,10 @@ async function deletarLancamento(id) {
     await sbDelete('ete_consumo', id);
     lancamentos  = lancamentos.filter(function(r) { return r.id !== id; });
     consumoData  = consumoData.filter(function(r) { return r.id !== id; });
+    if (rdEditingId === id) cancelarEdicaoRD();
     renderLancamentos();
     initDashboard();
+    if (typeof atualizarSaldoDia === 'function') atualizarSaldoDia();
     showToast('Registro removido');
   } catch(err) {
     showToast('Erro ao remover: ' + err.message, 'error');
