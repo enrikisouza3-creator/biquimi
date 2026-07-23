@@ -341,6 +341,7 @@
   <button class="tab-btn" onclick="switchTab('cruzamento')">Comparativo SharePoint</button>
   <button class="tab-btn" onclick="switchTab('custos')">Custos</button>
   <button class="tab-btn" onclick="switchTab('lancamento')">Lançar Consumo</button>
+  <button class="tab-btn" onclick="switchTab('reporte-diario')">📋 Relatório Diário</button>
   <button class="tab-btn" onclick="switchTab('metas')">Metas / Limites</button>
   <button class="tab-btn" onclick="switchTab('novo-quimico')">Novo Químico</button>
   <button class="tab-btn" onclick="switchTab('apresentacao');initApresentacao()">▶ Apresentação</button>
@@ -651,6 +652,67 @@
       <table>
         <thead><tr><th>Data</th><th>Turno</th><th>Operador</th><th>Ác. Sulfúrico</th><th>Soda</th><th>PAC</th><th>Ác. Nítrico</th><th>Pol. Dec.</th><th>Pol. Flot.</th><th>Antiespum.</th><th></th></tr></thead>
         <tbody id="lancTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- RELATÓRIO DIÁRIO -->
+<div class="tab-panel" id="tab-reporte-diario">
+  <div class="lanc-header">
+    <div class="lanc-header-left">
+      <div class="lanc-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M8 9h8M8 13h8M8 17h5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div><h3>Relatório Diário por Turno</h3><p>Escolha o turno, lance os dados e acompanhe o saldo do dia em tempo real</p></div>
+    </div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:5px 14px;">Compartilhado entre todos os turnos</div>
+  </div>
+
+  <div class="lanc-form-card">
+    <div class="lanc-form-title">Novo lançamento</div>
+    <div class="lanc-grid-top">
+      <div class="lanc-field"><label>Data</label><input type="date" id="rdData" class="lanc-input" onchange="atualizarSaldoDia()"></div>
+      <div class="lanc-field"><label>Turno</label><select id="rdTurno" class="lanc-input"><option value="Noite">Noite</option><option value="Manhã">Manhã</option><option value="Tarde">Tarde</option></select></div>
+      <div class="lanc-field">
+        <label>Operador</label>
+        <div class="op-chip-label">Selecione ou adicione:</div>
+        <div class="operadores-chips" id="rdOperChips">
+          <span class="op-chip" data-op="Douglas" onclick="selecionarOpRD('Douglas')">Douglas</span>
+          <span class="op-chip" data-op="Bruce" onclick="selecionarOpRD('Bruce')">Bruce</span>
+          <span class="op-chip" data-op="Luciano" onclick="selecionarOpRD('Luciano')">Luciano</span>
+          <span class="op-chip" data-op="Ruan" onclick="selecionarOpRD('Ruan')">Ruan</span>
+          <span class="op-chip op-chip-new" onclick="adicionarOperadorRD()">+ Novo</span>
+        </div>
+        <input type="hidden" id="rdOperador" value="">
+      </div>
+    </div>
+    <div class="lanc-form-title">Quantidades consumidas neste turno</div>
+    <div class="lanc-quimicos-grid">
+      <div class="lanc-field"><label><span class="dot" style="background:#e04535"></span>Ácido Sulfúrico</label><div class="lanc-input-wrap"><input type="number" id="rdAcido" class="lanc-num" min="0" step="0.5" placeholder="0"><span class="lanc-unit">kg</span></div></div>
+      <div class="lanc-field"><label><span class="dot" style="background:#2471e8"></span>Soda</label><div class="lanc-input-wrap"><input type="number" id="rdSoda" class="lanc-num" min="0" step="0.5" placeholder="0"><span class="lanc-unit">kg</span></div></div>
+      <div class="lanc-field"><label><span class="dot" style="background:#0fa899"></span>PAC</label><div class="lanc-input-wrap"><input type="number" id="rdPac" class="lanc-num" min="0" step="0.5" placeholder="0"><span class="lanc-unit">kg</span></div></div>
+      <div class="lanc-field"><label><span class="dot" style="background:#e8700e"></span>Ácido Nítrico</label><div class="lanc-input-wrap"><input type="number" id="rdAcidoRec" class="lanc-num" min="0" step="0.5" placeholder="0"><span class="lanc-unit">kg</span></div></div>
+      <div class="lanc-field"><label><span class="dot" style="background:#8b5cf6"></span>Pol. Decanter</label><div class="lanc-input-wrap"><input type="number" id="rdPolDec" class="lanc-num" min="0" step="0.5" placeholder="0"><span class="lanc-unit">kg</span></div></div>
+      <div class="lanc-field"><label><span class="dot" style="background:#d4920f"></span>Pol. Flotadores</label><div class="lanc-input-wrap"><input type="number" id="rdPolFlot" class="lanc-num" min="0" step="0.5" placeholder="0"><span class="lanc-unit">kg</span></div></div>
+      <div class="lanc-field"><label><span class="dot" style="background:#7a8499"></span>Antiespumante</label><div class="lanc-input-wrap"><input type="number" id="rdAnti" class="lanc-num" min="0" step="0.5" placeholder="0"><span class="lanc-unit">kg/L</span></div></div>
+    </div>
+    <div class="lanc-actions">
+      <button class="btn-lanc-salvar" onclick="salvarReporteDiario()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 5l-6 6-3-3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Salvar Turno</button>
+      <button class="btn-lanc-limpar" onclick="limparFormReporteDiario()">Limpar</button>
+      <div class="lanc-resumo" id="rdResumo">Selecione uma data para ver o saldo do dia.</div>
+    </div>
+  </div>
+
+  <div class="table-card" style="padding:20px;">
+    <div class="table-header" style="padding:0 0 14px 0;">
+      <div class="card-title" style="margin-bottom:0;">Saldo do Dia — <span id="rdSaldoData">—</span></div>
+      <button class="btn-reset" onclick="atualizarSaldoDia()">↻ Atualizar</button>
+    </div>
+    <div id="rdSaldoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px;"></div>
+    <div class="card-title" style="margin-bottom:10px;">Lançamentos do dia por turno</div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Turno</th><th>Operador</th><th>Ác. Sulfúrico</th><th>Soda</th><th>PAC</th><th>Ác. Nítrico</th><th>Pol. Dec.</th><th>Pol. Flot.</th><th>Antiespum.</th></tr></thead>
+        <tbody id="rdTurnosTableBody"></tbody>
       </table>
     </div>
   </div>
@@ -1018,6 +1080,16 @@ async function sbUpdate(table, id, payload) {
   return r.json();
 }
 
+async function sbUpsert(table, payload, conflictCol) {
+  var r = await fetch(SUPABASE_URL + '/rest/v1/' + table + '?on_conflict=' + conflictCol, {
+    method: 'POST',
+    headers: Object.assign({ 'Prefer': 'resolution=merge-duplicates,return=representation' }, sbHeaders()),
+    body: JSON.stringify(payload)
+  });
+  if (!r.ok) { var e = await r.text(); throw new Error('Supabase UPSERT error ' + r.status + ': ' + e); }
+  return r.json();
+}
+
 // ════════════════════════════════════════════════════════════════
 //  CARREGAR DADOS DO SUPABASE
 // ════════════════════════════════════════════════════════════════
@@ -1052,6 +1124,7 @@ async function carregarDados() {
       };
     });
     lancamentos = [...consumoData]; // espelho local para a aba Lançamento
+    if (typeof atualizarSaldoDia === 'function') atualizarSaldoDia();
 
     var datas = sortDates([...new Set(consumoData.map(function(r) { return r.data; }))]);
     var periodo = datas.length > 1 ? datas[0] + ' a ' + datas[datas.length - 1] : (datas[0] || '');
@@ -1737,6 +1810,130 @@ async function salvarLancamento() {
   setLoading(false);
 }
 
+// ════════════════════════════════════════════════════════════════
+//  RELATÓRIO DIÁRIO — lançamento por turno + saldo do dia
+// ════════════════════════════════════════════════════════════════
+function selecionarOpRD(nome) {
+  document.querySelectorAll('#rdOperChips .op-chip[data-op]').forEach(function(c) { c.classList.remove('selected'); });
+  var chip = document.querySelector('#rdOperChips .op-chip[data-op="' + nome + '"]');
+  if (chip) chip.classList.add('selected');
+  document.getElementById('rdOperador').value = nome;
+}
+
+function adicionarOperadorRD() {
+  var nome = prompt('Nome do operador:');
+  if (!nome || !nome.trim()) return;
+  var n = nome.trim();
+  if (document.querySelector('#rdOperChips .op-chip[data-op="' + n + '"]')) { selecionarOpRD(n); return; }
+  var chips = document.getElementById('rdOperChips');
+  var newBtn = chips.querySelector('.op-chip-new');
+  var chip = document.createElement('span');
+  chip.className = 'op-chip';
+  chip.dataset.op = n;
+  chip.textContent = n;
+  chip.onclick = function() { selecionarOpRD(n); };
+  chips.insertBefore(chip, newBtn);
+  selecionarOpRD(n);
+}
+
+function limparFormReporteDiario() {
+  ['rdAcido', 'rdSoda', 'rdPac', 'rdAcidoRec', 'rdPolDec', 'rdPolFlot', 'rdAnti'].forEach(function(id) { document.getElementById(id).value = ''; });
+  document.querySelectorAll('#rdOperChips .op-chip[data-op]').forEach(function(c) { c.classList.remove('selected'); });
+  document.getElementById('rdOperador').value = '';
+}
+
+function rdDataStr() {
+  var dataVal = document.getElementById('rdData').value;
+  if (!dataVal) return '';
+  var parts = dataVal.split('-');
+  return parts[2] + '/' + parts[1];
+}
+
+async function salvarReporteDiario() {
+  var dataVal  = document.getElementById('rdData').value;
+  var turno    = document.getElementById('rdTurno').value;
+  var operador = document.getElementById('rdOperador').value;
+  if (!dataVal)   { showToast('Selecione a data', 'error'); return; }
+  if (!operador)  { showToast('Selecione o operador', 'error'); return; }
+  var dataStr = rdDataStr();
+  var toN = function(id) { var v = parseFloat(document.getElementById(id).value); return isNaN(v) ? 0 : v; };
+  var payload = {
+    data: dataStr, turno: turno, operador: operador,
+    acido: toN('rdAcido'), soda: toN('rdSoda'), pac: toN('rdPac'),
+    acido_rec: toN('rdAcidoRec'), pol_dec: toN('rdPolDec'),
+    pol_flot: toN('rdPolFlot'), anti: toN('rdAnti'), obs: ''
+  };
+  setLoading(true);
+  try {
+    var inserted = await sbInsert('ete_consumo', payload);
+    var rec = inserted[0];
+    var registro = { id: rec.id, data: rec.data, turno: rec.turno, operador: rec.operador, acido: Number(rec.acido)||0, soda: Number(rec.soda)||0, pac: Number(rec.pac)||0, acidoRec: Number(rec.acido_rec)||0, polDec: Number(rec.pol_dec)||0, polFlot: Number(rec.pol_flot)||0, anti: Number(rec.anti)||0, obs: rec.obs||'' };
+    lancamentos.push(registro);
+    consumoData.push(registro);
+    renderLancamentos();
+    initDashboard();
+    limparFormReporteDiario();
+    atualizarSaldoDia();
+    showToast('Turno ' + turno + ' salvo! · ' + dataStr + ' · ' + operador);
+  } catch(err) {
+    showToast('Erro ao salvar: ' + err.message, 'error');
+  }
+  setLoading(false);
+}
+
+function atualizarSaldoDia() {
+  var dataStr = rdDataStr();
+  var grid = document.getElementById('rdSaldoGrid');
+  var tbody = document.getElementById('rdTurnosTableBody');
+  var lbl = document.getElementById('rdSaldoData');
+  var resumo = document.getElementById('rdResumo');
+  if (!grid || !tbody) return;
+  lbl.textContent = dataStr || '—';
+  grid.innerHTML = '';
+  tbody.innerHTML = '';
+  if (!dataStr) { resumo.innerHTML = 'Selecione uma data para ver o saldo do dia.'; return; }
+
+  var doDia = lancamentos.filter(function(r) { return r.data === dataStr; });
+
+  Object.keys(METAS_LABELS).forEach(function(campo) {
+    var ml = METAS_LABELS[campo];
+    var acumulado = doDia.reduce(function(s, r) { return s + (Number(r[campo]) || 0); }, 0);
+    var meta = getMeta(campo);
+    var saldo = meta - acumulado;
+    var estourou = meta > 0 && saldo < 0;
+    var card = document.createElement('div');
+    card.style.cssText = 'background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;';
+    card.innerHTML =
+      '<div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;">' +
+        '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + ml.cor + ';flex-shrink:0;"></span>' +
+        '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:0.82rem;color:var(--text);">' + ml.label + '</span>' +
+      '</div>' +
+      '<div style="font-size:0.68rem;color:var(--text-muted);">Acumulado / Meta</div>' +
+      '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:4px;">' +
+        acumulado.toLocaleString('pt-BR', {maximumFractionDigits:1}) + ' / ' + meta.toLocaleString('pt-BR', {maximumFractionDigits:1}) + ' kg</div>' +
+      '<div style="font-size:0.68rem;color:var(--text-muted);">Saldo p/ próximos turnos</div>' +
+      '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:1.05rem;color:' + (estourou ? 'var(--red-light)' : 'var(--green-light)') + ';">' +
+        (saldo >= 0 ? '' : '') + saldo.toLocaleString('pt-BR', {maximumFractionDigits:1}) + ' kg</div>';
+    grid.appendChild(card);
+  });
+
+  var fmt = function(v) { return v === 0 ? '<span class="zero-cell">—</span>' : '<span class="num-cell">' + v.toLocaleString('pt-BR', {maximumFractionDigits:1}) + '</span>'; };
+  var ordem = { 'Noite': 0, 'Manhã': 1, 'Tarde': 2 };
+  var sortedDia = [...doDia].sort(function(a,b){ return (ordem[a.turno]||9) - (ordem[b.turno]||9); });
+  if (!sortedDia.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:16px;">Nenhum lançamento para esta data ainda.</td></tr>';
+  } else {
+    sortedDia.forEach(function(r) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td><strong>' + (r.turno || '—') + '</strong></td><td><span class="op-tag">' + r.operador + '</span></td>' +
+        '<td>' + fmt(r.acido) + '</td><td>' + fmt(r.soda) + '</td><td>' + fmt(r.pac) + '</td>' +
+        '<td>' + fmt(r.acidoRec) + '</td><td>' + fmt(r.polDec) + '</td><td>' + fmt(r.polFlot) + '</td><td>' + fmt(r.anti) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+  resumo.innerHTML = '<strong>' + doDia.length + '</strong> turno(s) lançado(s) em ' + dataStr;
+}
+
 async function deletarLancamento(id) {
   if (!confirm('Remover este registro?')) return;
   setLoading(true);
@@ -2181,9 +2378,28 @@ function salvarMetas() {
   });
   metasConfig = novas;
   saveMetas(novas);
+  var rows = Object.keys(novas).map(function(campo) { return { quimico: campo, meta: novas[campo] }; });
+  sbUpsert('ete_metas', rows, 'quimico').catch(function() { /* tabela ainda não existe no Supabase — meta fica só local até criá-la */ });
   var badge = document.getElementById('metasSavedBadge');
   if (badge) { badge.style.display = 'flex'; setTimeout(function() { badge.style.display = 'none'; }, 3000); }
   showToast('Metas salvas com sucesso!');
+  atualizarSaldoDia();
+}
+
+async function carregarMetasSupabase() {
+  try {
+    var rows = await sbGet('ete_metas');
+    if (rows && rows.length) {
+      var remoto = {};
+      rows.forEach(function(r) { remoto[r.quimico] = Number(r.meta) || 0; });
+      metasConfig = Object.assign({}, metasConfig, remoto);
+      saveMetas(metasConfig);
+      renderMetasGrid();
+      atualizarSaldoDia();
+    }
+  } catch (e) {
+    // Tabela 'ete_metas' ainda não existe no Supabase — segue usando metas locais (por navegador).
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -2644,6 +2860,19 @@ function renderSptComparativo() {
 
 // ── Carregar dados do Supabase ao iniciar
 carregarDados();
+carregarMetasSupabase();
+
+// ── Relatório Diário: data padrão = hoje
+(function initRdData() {
+  var el = document.getElementById('rdData');
+  if (!el) return;
+  var hoje = new Date();
+  var yyyy = hoje.getFullYear();
+  var mm = String(hoje.getMonth() + 1).padStart(2, '0');
+  var dd = String(hoje.getDate()).padStart(2, '0');
+  el.value = yyyy + '-' + mm + '-' + dd;
+  atualizarSaldoDia();
+})();
 
 </script>
 </body>
