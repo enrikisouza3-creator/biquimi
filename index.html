@@ -341,7 +341,7 @@
   <button class="tab-btn" onclick="switchTab('cruzamento')">Comparativo SharePoint</button>
   <button class="tab-btn" onclick="switchTab('custos')">Custos</button>
   <button class="tab-btn" onclick="switchTab('lancamento')">Lançar Consumo</button>
-  <button class="tab-btn" onclick="switchTab('reporte-diario')">Relatório Diário</button>
+  <button class="tab-btn" onclick="switchTab('reporte-diario')">📋 Relatório Diário</button>
   <button class="tab-btn" onclick="switchTab('metas')">Metas / Limites</button>
   <button class="tab-btn" onclick="switchTab('novo-quimico')">Novo Químico</button>
   <button class="tab-btn" onclick="switchTab('apresentacao');initApresentacao()">▶ Apresentação</button>
@@ -2607,20 +2607,20 @@ function renderMetasGrid() {
   var grid = document.getElementById('metasGrid');
   if (!grid) return;
   grid.innerHTML = '';
-  Object.keys(METAS_LABELS).forEach(function(campo) {
-    var ml = METAS_LABELS[campo];
+  getCamposAtivos().forEach(function(cq) {
+    var campo = cq.campo;
     var val = getMeta(campo);
     var div = document.createElement('div');
     div.style.cssText = 'background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;';
     div.innerHTML =
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">' +
-        '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + ml.cor + ';flex-shrink:0;"></span>' +
-        '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:0.88rem;color:var(--text);">' + ml.label + '</span>' +
+        '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + cq.cor + ';flex-shrink:0;"></span>' +
+        '<span style="font-family:Syne,sans-serif;font-weight:700;font-size:0.88rem;color:var(--text);">' + cq.label + '</span>' +
       '</div>' +
       '<div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Meta diária (kg/dia)</div>' +
       '<div style="display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--panel);">' +
         '<input type="number" id="meta_' + campo + '" min="0" step="1" value="' + val + '" ' +
-          'style="border:none;outline:none;padding:8px 12px;font-size:0.95rem;font-family:Syne,sans-serif;font-weight:800;color:' + ml.cor + ';width:100%;background:transparent;">' +
+          'style="border:none;outline:none;padding:8px 12px;font-size:0.95rem;font-family:Syne,sans-serif;font-weight:800;color:' + cq.cor + ';width:100%;background:transparent;">' +
         '<span style="padding:8px 10px;background:var(--panel2);font-size:0.75rem;color:var(--text-muted);border-left:1px solid var(--border);">kg</span>' +
       '</div>' +
       (campo === 'polDec' || campo === 'polFlot' ?
@@ -2631,9 +2631,9 @@ function renderMetasGrid() {
 
 function salvarMetas() {
   var novas = {};
-  Object.keys(METAS_LABELS).forEach(function(campo) {
-    var el = document.getElementById('meta_' + campo);
-    if (el) novas[campo] = parseFloat(el.value) || 0;
+  getCamposAtivos().forEach(function(cq) {
+    var el = document.getElementById('meta_' + cq.campo);
+    if (el) novas[cq.campo] = parseFloat(el.value) || 0;
   });
   metasConfig = novas;
   saveMetas(novas);
