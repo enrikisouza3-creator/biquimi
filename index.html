@@ -707,6 +707,15 @@
     <div class="card-title" style="margin-bottom:10px;font-size:0.85rem;">Meta do dia x Saldo para próximos turnos</div>
     <div id="rdSaldoGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:22px;"></div>
 
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;color:var(--text);">Ver turno:</span>
+      <div id="rdTurnoSeletor" style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="oper-btn active" data-turno="Todos"  onclick="selecionarTurnoRD('Todos')"  style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;">Todos</button>
+        <button class="oper-btn" data-turno="Manhã" onclick="selecionarTurnoRD('Manhã')" style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;">Manhã</button>
+        <button class="oper-btn" data-turno="Tarde" onclick="selecionarTurnoRD('Tarde')" style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;">Tarde</button>
+        <button class="oper-btn" data-turno="Noite" onclick="selecionarTurnoRD('Noite')" style="padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;">Noite</button>
+      </div>
+    </div>
     <div id="rdTurnoBlocks" style="display:flex;flex-direction:column;gap:18px;margin-bottom:22px;"></div>
 
     <div class="card-title" style="margin-bottom:10px;">Lançamentos do dia por turno</div>
@@ -2150,6 +2159,16 @@ function statusCor(diff) {
   return diff >= 0 ? 'var(--green-light)' : 'var(--red-light)';
 }
 
+var rdTurnoSelecionado = 'Todos';
+
+function selecionarTurnoRD(turno) {
+  rdTurnoSelecionado = turno;
+  document.querySelectorAll('#rdTurnoSeletor .oper-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.turno === turno);
+  });
+  atualizarSaldoDia();
+}
+
 function atualizarSaldoDia() {
   var dataStr = rdDataStr();
   var grid = document.getElementById('rdSaldoGrid');
@@ -2189,20 +2208,25 @@ function atualizarSaldoDia() {
     grid.appendChild(card);
   });
 
-  // ── Blocos por turno: gasto do turno + diferença vs meta/3 + parâmetros
-  ['Noite', 'Manhã', 'Tarde'].forEach(function(turno, idx) {
-    var doTurno = doDia.filter(function(r) { return r.turno === turno; });
+  // ── Bloco único de turno: mostra "Todos" (soma dos 3 turnos) ou um turno específico,
+  // de acordo com o seletor rdTurnoSelecionado.
+  (function() {
+    var turnoSel = rdTurnoSelecionado || 'Todos';
+    var doTurno = turnoSel === 'Todos' ? doDia : doDia.filter(function(r) { return r.turno === turnoSel; });
+    var divisor = turnoSel === 'Todos' ? 1 : 3; // meta do turno = meta do dia inteira (Todos) ou meta do dia / 3 (turno individual)
+    var idx = 0;
     var box = document.createElement('div');
     box.style.cssText = 'border:1px solid var(--border);border-radius:12px;padding:16px;background:var(--panel);';
     var chartId = 'rdChartGasto_' + idx;
     var diffTableId = 'rdDiffTable_' + idx;
     var paramChartsId = 'rdParamCharts_' + idx;
+    var tituloTurno = turnoSel === 'Todos' ? 'Todos os Turnos' : 'Turno ' + turnoSel;
     box.innerHTML =
-      '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:0.95rem;color:var(--text);margin-bottom:10px;">Turno ' + turno + (doTurno.length ? '' : ' <span style="font-weight:400;font-size:0.72rem;color:var(--text-muted);">— sem lançamento</span>') + '</div>' +
+      '<div style="font-family:Syne,sans-serif;font-weight:800;font-size:0.95rem;color:var(--text);margin-bottom:10px;">' + tituloTurno + (doTurno.length ? '' : ' <span style="font-weight:400;font-size:0.72rem;color:var(--text-muted);">— sem lançamento</span>') + '</div>' +
       (doTurno.length ? (
         '<div style="display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:start;">' +
           '<div>' +
-            '<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">Gasto do turno da ' + turno.toLowerCase() + '</div>' +
+            '<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">Gasto ' + (turnoSel === 'Todos' ? 'do dia (todos os turnos)' : 'do turno da ' + turnoSel.toLowerCase()) + '</div>' +
             '<div style="height:180px;"><canvas id="' + chartId + '"></canvas></div>' +
           '</div>' +
           '<div><table id="' + diffTableId + '" style="width:100%;font-size:0.78rem;"></table></div>' +
@@ -2214,7 +2238,7 @@ function atualizarSaldoDia() {
 
     if (!doTurno.length) return;
 
-    // -- gasto do turno chart (soma caso haja mais de um lançamento no turno)
+    // -- gasto (soma dos lançamentos considerados: um turno, ou todos)
     var vals = camposQuimicos.map(function(cq) { return doTurno.reduce(function(s, r) { return s + (Number(r[cq.campo]) || 0); }, 0); });
     var lbls = camposQuimicos.map(function(cq) { return cq.label; });
     var clrs = camposQuimicos.map(function(cq) { return cq.cor; });
@@ -2226,22 +2250,22 @@ function atualizarSaldoDia() {
         scales: { x: { grid: { display: false }, ticks: { color: '#6b7897', font: { size: 9 } } }, y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 10 } }, beginAtZero: true } } }
     });
 
-    // -- diferença entre meta do turno (meta do dia / 3) e consumo do turno
-    var diffHtml = '<tr><th style="text-align:left;padding:5px 6px;color:var(--text-muted);font-size:0.68rem;">Produto</th><th style="padding:5px 6px;color:var(--text-muted);font-size:0.68rem;">Consumo</th><th style="padding:5px 6px;color:var(--text-muted);font-size:0.68rem;">Meta Turno</th><th style="padding:5px 6px;color:var(--text-muted);font-size:0.68rem;">Diferença</th></tr>';
+    // -- diferença entre a meta (do dia inteiro, se "Todos"; ou meta do dia/3, se turno único) e o consumo
+    var diffHtml = '<tr><th style="text-align:left;padding:5px 6px;color:var(--text-muted);font-size:0.68rem;">Produto</th><th style="padding:5px 6px;color:var(--text-muted);font-size:0.68rem;">Consumo</th><th style="padding:5px 6px;color:var(--text-muted);font-size:0.68rem;">' + (turnoSel === 'Todos' ? 'Meta do Dia' : 'Meta Turno') + '</th><th style="padding:5px 6px;color:var(--text-muted);font-size:0.68rem;">Diferença</th></tr>';
     camposQuimicos.forEach(function(cq) {
       var consumo = doTurno.reduce(function(s, r) { return s + (Number(r[cq.campo]) || 0); }, 0);
       var metaDia = getMeta(cq.campo);
-      var metaTurno = metaDia / 3;
-      var diff = metaTurno - consumo;
+      var metaRef = metaDia / divisor;
+      var diff = metaRef - consumo;
       var bg = metaDia > 0 ? (diff >= 0 ? '#d7f5df' : '#fbdadb') : 'transparent';
       diffHtml += '<tr style="background:' + bg + ';"><td style="padding:5px 6px;">' + cq.label + '</td>' +
         '<td style="padding:5px 6px;text-align:center;font-weight:700;">' + consumo.toLocaleString('pt-BR', {maximumFractionDigits:1}) + '</td>' +
-        '<td style="padding:5px 6px;text-align:center;color:var(--text-muted);">' + metaTurno.toLocaleString('pt-BR', {maximumFractionDigits:1}) + '</td>' +
+        '<td style="padding:5px 6px;text-align:center;color:var(--text-muted);">' + metaRef.toLocaleString('pt-BR', {maximumFractionDigits:1}) + '</td>' +
         '<td style="padding:5px 6px;text-align:center;font-weight:700;color:' + (metaDia > 0 ? (diff >= 0 ? '#1a7a3a' : '#c0392b') : 'var(--text-muted)') + ';">' + (metaDia > 0 ? (diff >= 0 ? '+' : '') + diff.toLocaleString('pt-BR', {maximumFractionDigits:1}) : '—') + '</td></tr>';
     });
     document.getElementById(diffTableId).innerHTML = diffHtml;
 
-    // -- mini gráficos de parâmetros de processo (pH / OD) — última leitura do turno
+    // -- mini gráficos de parâmetros de processo (pH / OD) — última leitura considerada
     var ultima = doTurno[doTurno.length - 1];
     var paramContainer = document.getElementById(paramChartsId);
     PARAM_CHART_GROUPS.forEach(function(grp, gi) {
@@ -2260,7 +2284,7 @@ function atualizarSaldoDia() {
           scales: { x: { grid: { display: false }, ticks: { color: '#6b7897', font: { size: 9 } } }, y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 9 } }, beginAtZero: true } } }
       });
     });
-  });
+  })();
 
   var fmt = function(v) { return v === 0 ? '<span class="zero-cell">—</span>' : '<span class="num-cell">' + v.toLocaleString('pt-BR', {maximumFractionDigits:1}) + '</span>'; };
   var ordem = { 'Noite': 0, 'Manhã': 1, 'Tarde': 2 };
