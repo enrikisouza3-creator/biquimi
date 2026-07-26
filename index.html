@@ -369,32 +369,12 @@
 <div class="tab-panel" id="tab-consumo-dia">
   <div class="card" style="margin-bottom:14px">
     <div class="card-title" id="dayChartTitle">Consumo Diário</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="dayChartFilters">
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="acido" checked onchange="renderDayChart()" style="accent-color:#e04535"> <span style="color:#e04535;font-weight:600;">Ácido Sulfúrico</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="soda" onchange="renderDayChart()" style="accent-color:#2471e8"> <span style="color:#2471e8;font-weight:600;">Soda (kg)</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="pac" onchange="renderDayChart()" style="accent-color:#0fa899"> <span style="color:#0fa899;font-weight:600;">PAC (kg)</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="acidoRec" onchange="renderDayChart()" style="accent-color:#e8700e"> <span style="color:#e8700e;font-weight:600;">Ácido Nítrico</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="polDec" onchange="renderDayChart()" style="accent-color:#8b5cf6"> <span style="color:#8b5cf6;font-weight:600;">Pol. Decanter</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="polFlot" onchange="renderDayChart()" style="accent-color:#d4920f"> <span style="color:#d4920f;font-weight:600;">Pol. Flotadores</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="anti" onchange="renderDayChart()" style="accent-color:#7a8499"> <span style="color:#7a8499;font-weight:600;">Antiespumante</span></label>
-      <button onclick="toggleDayFilters(true)" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;color:var(--teal);">Todos</button>
-      <button onclick="toggleDayFilters(false)" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;color:var(--text-muted);">Nenhum</button>
-    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="dayChartFilters"></div>
     <div class="chart-wrap" style="height:300px"><canvas id="chartDay"></canvas></div>
   </div>
   <div style="margin-top:14px" class="card">
     <div class="card-title">Todos os Químicos por Dia</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="allDayFilters">
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="acido" checked onchange="renderAllDayChart()" style="accent-color:#e04535"> <span style="color:#e04535;font-weight:600;">Ácido Sulfúrico</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="soda" checked onchange="renderAllDayChart()" style="accent-color:#2471e8"> <span style="color:#2471e8;font-weight:600;">Soda (kg)</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="pac" checked onchange="renderAllDayChart()" style="accent-color:#0fa899"> <span style="color:#0fa899;font-weight:600;">PAC (kg)</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="acidoRec" checked onchange="renderAllDayChart()" style="accent-color:#e8700e"> <span style="color:#e8700e;font-weight:600;">Ácido Nítrico</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="polDec" checked onchange="renderAllDayChart()" style="accent-color:#8b5cf6"> <span style="color:#8b5cf6;font-weight:600;">Pol. Decanter</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="polFlot" checked onchange="renderAllDayChart()" style="accent-color:#d4920f"> <span style="color:#d4920f;font-weight:600;">Pol. Flotadores</span></label>
-      <label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;"><input type="checkbox" value="anti" onchange="renderAllDayChart()" style="accent-color:#7a8499"> <span style="color:#7a8499;font-weight:600;">Antiespumante</span></label>
-      <button onclick="toggleAllDayFilters(true)" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;color:var(--teal);">Todos</button>
-      <button onclick="toggleAllDayFilters(false)" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;color:var(--text-muted);">Nenhum</button>
-    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="allDayFilters"></div>
     <div class="chart-wrap" style="height:300px"><canvas id="chartAllDay"></canvas></div>
   </div>
 </div>
@@ -426,6 +406,10 @@
     <div class="card"><div class="card-title">Antiespumante por Operador</div><div class="chart-wrap"><canvas id="chartOperAnti"></canvas></div></div>
     <div class="card"><div class="card-title">Total por Operador (todos químicos)</div><div class="chart-wrap"><canvas id="chartOperTotal"></canvas></div></div>
   </div>
+  <div id="operCustomSection" style="display:none;">
+    <div style="margin-bottom:8px;padding:4px 0 8px 2px;"><span style="font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--teal-light);border-bottom:2px solid var(--teal-light);padding-bottom:3px;">Químicos Cadastrados pelo Usuário</span></div>
+    <div class="charts-row-3" id="operCustomGrid" style="margin-bottom:24px;"></div>
+  </div>
 </div>
 
 <!-- TABELA -->
@@ -440,7 +424,7 @@
     <div class="table-header"><div class="card-title">Consumo por Turno</div><div class="record-count" id="tableCount">— registros</div></div>
     <div style="overflow-x:auto">
       <table>
-        <thead><tr><th>Data</th><th>Turno</th><th>Operador</th><th>Ác. Sulfúrico (kg)</th><th>Soda (kg)</th><th>PAC (kg)</th><th>Ácido Nítrico (kg)</th><th>Pol. Decanter (kg)</th><th>Pol. Flotadores (kg)</th><th>Antiespumante</th><th>Obs.</th><th style="text-align:center">Ações</th></tr></thead>
+        <thead><tr id="tableHeadRow"><th>Data</th><th>Turno</th><th>Operador</th><th>Ác. Sulfúrico (kg)</th><th>Soda (kg)</th><th>PAC (kg)</th><th>Ácido Nítrico (kg)</th><th>Pol. Decanter (kg)</th><th>Pol. Flotadores (kg)</th><th>Antiespumante</th><th id="tableHeadCustomInsert"></th><th>Obs.</th><th style="text-align:center">Ações</th></tr></thead>
         <tbody id="tableBody"></tbody>
       </table>
     </div>
@@ -481,15 +465,7 @@
   <!-- FILTROS E SELETOR DE QUÍMICO -->
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
     <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);">Operadores vs SharePoint</div>
-    <select id="sptQuimicoFiltro" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderSptComparativo()">
-      <option value="acido">Ácido Sulfúrico</option>
-      <option value="pac">PAC</option>
-      <option value="polDec">Pol. Decanter</option>
-      <option value="polFlot">Pol. Flotadores</option>
-      <option value="acidoRec">Ácido Nítrico</option>
-      <option value="soda">Soda</option>
-      <option value="anti">Antiespumante</option>
-    </select>
+    <select id="sptQuimicoFiltro" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderSptComparativo()"></select>
     <div style="display:flex;gap:8px;margin-left:auto;">
       <select id="sptFiltroIni" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderSptComparativo()"><option value="">De</option></select>
       <select id="sptFiltroFim" style="border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.8rem;background:var(--panel2);color:var(--text);font-family:'DM Sans',sans-serif;" onchange="renderSptComparativo()"><option value="">Até</option></select>
@@ -550,7 +526,7 @@
   <div class="custos-filtros">
     <div class="fg"><label>Data início</label><select id="custoFiltroDataIni" onchange="renderCustos()"><option value="">Todas</option></select></div>
     <div class="fg"><label>Data fim</label><select id="custoFiltroDataFim" onchange="renderCustos()"><option value="">Todas</option></select></div>
-    <div class="fg"><label>Produto</label><select id="custoFiltroProduto" onchange="renderCustos()"><option value="">Todos</option><option value="acido">Ácido Sulfúrico</option><option value="acidoRec">Ácido Nítrico</option><option value="soda">Soda</option><option value="pac">PAC</option><option value="polDec">Pol. Decanter</option><option value="polFlot">Pol. Flotadores</option><option value="anti">Antiespumante</option></select></div>
+    <div class="fg"><label>Produto</label><select id="custoFiltroProduto" onchange="renderCustos()"><option value="">Todos</option></select></div>
     <div class="fg"><label>Operador</label><select id="custoFiltroOper" onchange="renderCustos()"><option value="">Todos</option></select></div>
     <button class="btn-reset-custos" onclick="resetCustosFiltros()">Limpar filtros</button>
     <div class="custos-filtros-badge" id="custosFiltrosBadge"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span id="custosFiltrosBadgeText">Todos os dados</span></div>
@@ -1025,26 +1001,35 @@ function fmtNum(v) {
 }
 
 function byDate(data) {
+  var campos = getCamposAtivos().map(function(c) { return c.campo; });
   var map = {};
   data.forEach(function(r) {
-    if (!map[r.data]) map[r.data] = { data: r.data, acido: 0, soda: 0, pac: 0, acidoRec: 0, polDec: 0, polFlot: 0, anti: 0 };
-    ['acido', 'soda', 'pac', 'acidoRec', 'polDec', 'polFlot', 'anti'].forEach(function(f) {
-      map[r.data][f] += r[f];
+    if (!map[r.data]) {
+      map[r.data] = { data: r.data };
+      campos.forEach(function(f) { map[r.data][f] = 0; });
+    }
+    campos.forEach(function(f) {
+      map[r.data][f] += (Number(r[f]) || 0);
     });
   });
   return Object.values(map).filter(function(d) {
-    return ['acido','soda','pac','acidoRec','polDec','polFlot','anti'].some(function(f) { return d[f] > 0; });
+    return campos.some(function(f) { return d[f] > 0; });
   }).sort(function(a, b) { return dateOrd(a.data) - dateOrd(b.data); });
 }
 
 function byOper(data) {
+  var campos = getCamposAtivos().map(function(c) { return c.campo; });
   var map = {};
   data.forEach(function(r) {
-    if (!map[r.operador]) map[r.operador] = { operador: r.operador, acido: 0, soda: 0, pac: 0, acidoRec: 0, polDec: 0, polFlot: 0, anti: 0, total: 0 };
-    ['acido', 'soda', 'pac', 'acidoRec', 'polDec', 'polFlot', 'anti'].forEach(function(f) {
-      map[r.operador][f] += r[f];
+    if (!map[r.operador]) {
+      map[r.operador] = { operador: r.operador, total: 0 };
+      campos.forEach(function(f) { map[r.operador][f] = 0; });
+    }
+    campos.forEach(function(f) {
+      var v = Number(r[f]) || 0;
+      map[r.operador][f] += v;
+      map[r.operador].total += v;
     });
-    map[r.operador].total += r.acido + r.soda + r.pac + r.acidoRec + r.polDec + r.polFlot + r.anti;
   });
   return Object.values(map).sort(function(a, b) { return b.total - a.total; });
 }
@@ -1288,6 +1273,37 @@ function renderOverviewCharts(data) {
   });
 }
 
+function buildDayFilterCheckboxes() {
+  var campos = getCamposAtivos();
+  function mkLabel(c, checkedByDefault, handler) {
+    return '<label style="display:flex;align-items:center;gap:5px;font-size:0.8rem;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);user-select:none;">' +
+      '<input type="checkbox" value="' + c.campo + '"' + (checkedByDefault ? ' checked' : '') + ' onchange="' + handler + '()" style="accent-color:' + c.cor + '"> ' +
+      '<span style="color:' + c.cor + ';font-weight:600;">' + c.label + '</span></label>';
+  }
+  var dayEl = document.getElementById('dayChartFilters');
+  if (dayEl) {
+    var prevChecked = new Set([...dayEl.querySelectorAll('input:checked')].map(function(cb) { return cb.value; }));
+    var isFirstRender = dayEl.childElementCount === 0;
+    dayEl.innerHTML = campos.map(function(c, i) {
+      var checked = isFirstRender ? (i === 0) : prevChecked.has(c.campo);
+      return mkLabel(c, checked, 'renderDayChart');
+    }).join('') +
+      '<button onclick="toggleDayFilters(true)" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;color:var(--teal);">Todos</button>' +
+      '<button onclick="toggleDayFilters(false)" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;color:var(--text-muted);">Nenhum</button>';
+  }
+  var allDayEl = document.getElementById('allDayFilters');
+  if (allDayEl) {
+    var prevCheckedAll = new Set([...allDayEl.querySelectorAll('input:checked')].map(function(cb) { return cb.value; }));
+    var isFirstRenderAll = allDayEl.childElementCount === 0;
+    allDayEl.innerHTML = campos.map(function(c) {
+      var checked = isFirstRenderAll ? true : prevCheckedAll.has(c.campo);
+      return mkLabel(c, checked, 'renderAllDayChart');
+    }).join('') +
+      '<button onclick="toggleAllDayFilters(true)" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;color:var(--teal);">Todos</button>' +
+      '<button onclick="toggleAllDayFilters(false)" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--panel2);font-size:0.78rem;cursor:pointer;color:var(--text-muted);">Nenhum</button>';
+  }
+}
+
 function toggleDayFilters(state) {
   document.querySelectorAll('#dayChartFilters input[type=checkbox]').forEach(function(cb) { cb.checked = state; });
   renderDayChart();
@@ -1296,19 +1312,20 @@ function toggleDayFilters(state) {
 function renderDayChart() {
   var dates = byDate(consumoData);
   var checked = [...document.querySelectorAll('#dayChartFilters input[type=checkbox]:checked')].map(function(cb) { return cb.value; });
-  var allFields = [{ key: 'acido' }, { key: 'soda' }, { key: 'pac' }, { key: 'acidoRec' }, { key: 'polDec' }, { key: 'polFlot' }, { key: 'anti' }];
+  var allFields = getCamposAtivos().map(function(c) { return { key: c.campo, label: c.label, cor: c.cor }; });
   var datasets = allFields.filter(function(f) { return checked.includes(f.key); }).map(function(f) {
-    return { label: LABELS[f.key], data: dates.map(function(d) { return d[f.key]; }), backgroundColor: COLORS[f.key] + 'cc', borderColor: COLORS[f.key], borderWidth: 1, borderRadius: 4, borderSkipped: false };
+    return { label: f.label, data: dates.map(function(d) { return d[f.key] || 0; }), backgroundColor: f.cor + 'cc', borderColor: f.cor, borderWidth: 1, borderRadius: 4, borderSkipped: false };
   });
   // Meta individual: mostrar apenas quando 1 químico selecionado com meta > 0
   if (checked.length === 1) {
     var metaVal = getMeta(checked[0]);
     if (metaVal > 0) {
-      var metaLabel = (METAS_LABELS[checked[0]] ? METAS_LABELS[checked[0]].label : checked[0]);
       datasets.push({ label: 'Meta diária: ' + metaVal.toLocaleString('pt-BR') + ' kg', data: dates.map(function() { return metaVal; }), type: 'line', borderColor: '#16a34a', backgroundColor: 'transparent', borderWidth: 2.5, borderDash: [8, 5], pointRadius: 0, fill: false, order: -1, tension: 0 });
     }
   }
-  var titulo = checked.length === 1 ? 'Consumo Diário – ' + LABELS[checked[0]] : 'Consumo Diário – Múltiplos Químicos';
+  var campoLabelMap = {};
+  allFields.forEach(function(f) { campoLabelMap[f.key] = f.label; });
+  var titulo = checked.length === 1 ? 'Consumo Diário – ' + (campoLabelMap[checked[0]] || checked[0]) : 'Consumo Diário – Múltiplos Químicos';
   document.getElementById('dayChartTitle').textContent = titulo;
   destroyChart('chartDay');
   charts['chartDay'] = new Chart(document.getElementById('chartDay'), {
@@ -1327,8 +1344,8 @@ function toggleAllDayFilters(state) {
 function renderAllDayChart() {
   var dates = byDate(consumoData);
   var checked = [...document.querySelectorAll('#allDayFilters input[type=checkbox]:checked')].map(function(cb) { return cb.value; });
-  var datasets = ['acido', 'soda', 'pac', 'acidoRec', 'polDec', 'polFlot', 'anti'].filter(function(k) { return checked.includes(k); }).map(function(k) {
-    return { label: LABELS[k], data: dates.map(function(d) { return d[k]; }), borderColor: COLORS[k], backgroundColor: 'transparent', tension: 0.3, pointRadius: 4, borderWidth: 2 };
+  var datasets = getCamposAtivos().filter(function(c) { return checked.includes(c.campo); }).map(function(c) {
+    return { label: c.label, data: dates.map(function(d) { return d[c.campo] || 0; }), borderColor: c.cor, backgroundColor: 'transparent', tension: 0.3, pointRadius: 4, borderWidth: 2 };
   });
   destroyChart('chartAllDay');
   charts['chartAllDay'] = new Chart(document.getElementById('chartAllDay'), {
@@ -1344,7 +1361,9 @@ function renderOperCharts() {
   var labels = opers.map(function(o) { return o.operador; });
   function mkBar(id, lbl, vals, clr) {
     destroyChart(id);
-    charts[id] = new Chart(document.getElementById(id), {
+    var el = document.getElementById(id);
+    if (!el) return;
+    charts[id] = new Chart(el, {
       type: 'bar',
       data: { labels: labels, datasets: [{ label: lbl, data: vals, backgroundColor: clr, borderRadius: 5, borderSkipped: false }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#1a2035', font: { size: 11 } } }, y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 11 } }, beginAtZero: true } } }
@@ -1358,6 +1377,25 @@ function renderOperCharts() {
   mkBar('chartOperDecanter', 'Pol. Decanter',    opers.map(function(o) { return o.polDec; }),   COLORS.polDec);
   mkBar('chartOperPolFlot',  'Pol. Flotadores',  opers.map(function(o) { return o.polFlot; }),  COLORS.polFlot);
   mkBar('chartOperAnti',     'Antiespumante',    opers.map(function(o) { return o.anti; }),     COLORS.anti);
+
+  // Químicos personalizados: renderiza um card+chart dinâmico para cada um
+  var custom = loadCustomQuimicos();
+  var section = document.getElementById('operCustomSection');
+  var grid = document.getElementById('operCustomGrid');
+  if (section && grid) {
+    if (custom.length === 0) {
+      section.style.display = 'none';
+      grid.innerHTML = '';
+    } else {
+      section.style.display = '';
+      grid.innerHTML = custom.map(function(c) {
+        return '<div class="card"><div class="card-title">' + c.label + ' por Operador</div><div class="chart-wrap"><canvas id="chartOperCustom_' + c.campo + '"></canvas></div></div>';
+      }).join('');
+      custom.forEach(function(c) {
+        mkBar('chartOperCustom_' + c.campo, c.label, opers.map(function(o) { return o[c.campo] || 0; }), c.cor);
+      });
+    }
+  }
 }
 
 function buildTableFilters() {
@@ -1388,10 +1426,23 @@ function renderTable() {
   var pageData = tableFiltered.slice((tablePage - 1) * perPage, tablePage * perPage);
   var tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  var fmt = function(v) { return v === 0 ? '<span class="zero-cell">—</span>' : '<span class="num-cell">' + v.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '</span>'; };
+  var fmt = function(v) { return !v ? '<span class="zero-cell">—</span>' : '<span class="num-cell">' + v.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '</span>'; };
+
+  // Regenera o cabeçalho da tabela incluindo colunas de químicos customizados
+  var custom = loadCustomQuimicos();
+  var headRow = document.getElementById('tableHeadRow');
+  if (headRow) {
+    headRow.innerHTML =
+      '<th>Data</th><th>Turno</th><th>Operador</th><th>Ác. Sulfúrico (kg)</th><th>Soda (kg)</th><th>PAC (kg)</th>' +
+      '<th>Ácido Nítrico (kg)</th><th>Pol. Decanter (kg)</th><th>Pol. Flotadores (kg)</th><th>Antiespumante</th>' +
+      custom.map(function(c) { return '<th>' + c.label + '</th>'; }).join('') +
+      '<th>Obs.</th><th style="text-align:center">Ações</th>';
+  }
+
   pageData.forEach(function(r) {
     var tr = document.createElement('tr');
     tr.setAttribute('data-id', r.id || '');
+    var customCells = custom.map(function(c) { return '<td>' + fmt(Number(r[c.campo]) || 0) + '</td>'; }).join('');
     tr.innerHTML =
       '<td><strong>' + r.data + '</strong></td>' +
       '<td style="font-size:0.8rem;color:var(--text-muted)">' + (r.turno || '—') + '</td>' +
@@ -1403,6 +1454,7 @@ function renderTable() {
       '<td>' + fmt(r.polDec) + '</td>' +
       '<td>' + fmt(r.polFlot) + '</td>' +
       '<td>' + fmt(r.anti) + '</td>' +
+      customCells +
       '<td style="font-size:0.75rem;color:var(--text-muted)">' + (r.obs || '—') + '</td>' +
       '<td style="text-align:center;white-space:nowrap;">' +
         '<button onclick="abrirEdicao(\'' + r.id + '\')\" title="Editar" style="background:var(--teal);color:white;border:none;border-radius:6px;padding:4px 10px;font-size:0.75rem;cursor:pointer;margin-right:4px;">✏ Editar</button>' +
@@ -1539,7 +1591,18 @@ function buildCustosFiltros() {
   ecoSel.innerHTML = '<option value="">— Selecione a data —</option>' + datas.map(function(d) { return '<option value="' + d + '">' + d + '</option>'; }).join('');
 }
 
+function buildCustoFiltroProduto() {
+  var sel = document.getElementById('custoFiltroProduto');
+  if (!sel) return;
+  var prev = sel.value;
+  sel.innerHTML = '<option value="">Todos</option>' + getCamposAtivos().map(function(c) {
+    return '<option value="' + c.campo + '">' + c.label + '</option>';
+  }).join('');
+  if (prev && [...sel.options].some(function(o) { return o.value === prev; })) sel.value = prev;
+}
+
 function getCustosFiltrados() {
+  buildCustoFiltroProduto();
   var ini = document.getElementById('custoFiltroDataIni').value;
   var fim = document.getElementById('custoFiltroDataFim').value;
   var oper = document.getElementById('custoFiltroOper').value;
@@ -1551,20 +1614,24 @@ function getCustosFiltrados() {
     if (oper && r.operador !== oper) return false;
     return true;
   });
-  var masks = {
-    acido: { acidoRec: 0, soda: 0, pac: 0, polDec: 0, polFlot: 0, anti: 0 },
-    acidoRec: { acido: 0, soda: 0, pac: 0, polDec: 0, polFlot: 0, anti: 0 },
-    soda: { acido: 0, acidoRec: 0, pac: 0, polDec: 0, polFlot: 0, anti: 0 },
-    pac: { acido: 0, acidoRec: 0, soda: 0, polDec: 0, polFlot: 0, anti: 0 },
-    polDec: { acido: 0, acidoRec: 0, soda: 0, pac: 0, polFlot: 0, anti: 0 },
-    polFlot: { acido: 0, acidoRec: 0, soda: 0, pac: 0, polDec: 0, anti: 0 },
-    anti: { acido: 0, acidoRec: 0, soda: 0, pac: 0, polDec: 0, polFlot: 0 }
-  };
-  if (prod && masks[prod]) data = data.map(function(r) { return Object.assign({}, r, masks[prod]); });
+  // Máscara gerada dinamicamente a partir de TODOS os campos ativos (fixos + customs),
+  // garantindo que o filtro de produto zere corretamente qualquer químico não selecionado,
+  // incluindo os customizados.
+  if (prod) {
+    var todosCampos = getCamposAtivos().map(function(c) { return c.campo; });
+    if (todosCampos.includes(prod)) {
+      var mask = {};
+      todosCampos.forEach(function(f) { if (f !== prod) mask[f] = 0; });
+      data = data.map(function(r) { return Object.assign({}, r, mask); });
+    }
+  }
   var partes = [];
   if (ini || fim) partes.push((ini || 'início') + ' → ' + (fim || 'fim'));
   if (oper) partes.push(oper);
-  if (prod) partes.push(LABELS[prod] || prod);
+  if (prod) {
+    var campoInfo = getCamposAtivos().find(function(c) { return c.campo === prod; });
+    partes.push(campoInfo ? campoInfo.label : (LABELS[prod] || prod));
+  }
   document.getElementById('custosFiltrosBadgeText').textContent = partes.length > 0 ? partes.join(' · ') : 'Todos os dados';
   var badgeEl = document.getElementById('custosFiltrosBadge');
   badgeEl.style.background = partes.length > 0 ? '#fff3e0' : '#edfaf8';
@@ -1664,11 +1731,17 @@ function renderCustos() {
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmtBRL(ctx.raw); } } } }, scales: { x: { grid: { display: false }, ticks: { color: '#1a2035', font: { size: 12 } } }, y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 11 }, callback: function(v) { return fmtBRL(v); } } } } }
   });
 
+  // Custo diário e por operador considerando TODOS os químicos ativos (fixos + customs).
+  var camposAtivos = getCamposAtivos();
   var byDia = {};
   comCusto.forEach(function(r) {
-    if (!byDia[r.data]) byDia[r.data] = { acido: 0, acidoRec: 0 };
-    byDia[r.data].acido += r.custoAcido;
-    byDia[r.data].acidoRec += r.custoAcidoRec;
+    if (!byDia[r.data]) {
+      byDia[r.data] = {};
+      camposAtivos.forEach(function(c) { byDia[r.data][c.campo] = 0; });
+    }
+    camposAtivos.forEach(function(c) {
+      byDia[r.data][c.campo] += (Number(r[c.campo]) || 0) * (p[c.campo] || 0);
+    });
   });
   var diasSort = sortDates(Object.keys(byDia));
   destroyChart('chartCustoDia');
@@ -1676,31 +1749,38 @@ function renderCustos() {
     type: 'bar',
     data: {
       labels: diasSort,
-      datasets: [
-        { label: 'Ác. Sulfúrico', data: diasSort.map(function(d) { return byDia[d].acido; }), backgroundColor: COLORS.acido, borderRadius: 4, borderSkipped: false },
-        { label: 'Ác. Nítrico', data: diasSort.map(function(d) { return byDia[d].acidoRec; }), backgroundColor: COLORS.acidoRec, borderRadius: 4, borderSkipped: false },
+      datasets: camposAtivos.map(function(c) {
+        return { label: c.label, data: diasSort.map(function(d) { return byDia[d][c.campo]; }), backgroundColor: c.cor, borderRadius: 4, borderSkipped: false, stack: 'dia' };
+      }).concat([
         { label: 'Meta diária: R$ 5.500', data: diasSort.map(function() { return 5500; }), type: 'line', borderColor: '#16a34a', backgroundColor: 'transparent', borderWidth: 2.5, borderDash: [8, 5], pointRadius: 0, fill: false, order: -1, tension: 0 }
-      ]
+      ])
     },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#6b7897', font: { size: 11 }, boxWidth: 10, boxHeight: 10, padding: 10 } } }, scales: { x: { grid: { display: false }, ticks: { color: '#1a2035', font: { size: 10 }, maxRotation: 45 } }, y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 10 }, callback: function(v) { return 'R$' + v.toLocaleString('pt-BR'); } }, beginAtZero: true } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#6b7897', font: { size: 11 }, boxWidth: 10, boxHeight: 10, padding: 10 } } }, scales: { x: { grid: { display: false }, ticks: { color: '#1a2035', font: { size: 10 }, maxRotation: 45 }, stacked: true }, y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 10 }, callback: function(v) { return 'R$' + v.toLocaleString('pt-BR'); } }, beginAtZero: true, stacked: true } } }
   });
 
   var byOp = {};
   comCusto.forEach(function(r) {
-    if (!byOp[r.operador]) byOp[r.operador] = { acido: 0, acidoRec: 0 };
-    byOp[r.operador].acido += r.custoAcido;
-    byOp[r.operador].acidoRec += r.custoAcidoRec;
+    if (!byOp[r.operador]) {
+      byOp[r.operador] = {};
+      camposAtivos.forEach(function(c) { byOp[r.operador][c.campo] = 0; });
+    }
+    camposAtivos.forEach(function(c) {
+      byOp[r.operador][c.campo] += (Number(r[c.campo]) || 0) * (p[c.campo] || 0);
+    });
   });
-  var opSort = Object.entries(byOp).sort(function(a, b) { return (b[1].acido + b[1].acidoRec) - (a[1].acido + a[1].acidoRec); });
+  var opSort = Object.entries(byOp).sort(function(a, b) {
+    var totA = camposAtivos.reduce(function(s, c) { return s + a[1][c.campo]; }, 0);
+    var totB = camposAtivos.reduce(function(s, c) { return s + b[1][c.campo]; }, 0);
+    return totB - totA;
+  });
   destroyChart('chartCustoOper');
   charts['chartCustoOper'] = new Chart(document.getElementById('chartCustoOper'), {
     type: 'bar',
     data: {
       labels: opSort.map(function(o) { return o[0]; }),
-      datasets: [
-        { label: 'Ác. Sulfúrico', data: opSort.map(function(o) { return o[1].acido; }), backgroundColor: COLORS.acido, borderRadius: 4, borderSkipped: false, stack: 'op' },
-        { label: 'Ác. Nítrico', data: opSort.map(function(o) { return o[1].acidoRec; }), backgroundColor: COLORS.acidoRec, borderRadius: 4, borderSkipped: false, stack: 'op' }
-      ]
+      datasets: camposAtivos.map(function(c) {
+        return { label: c.label, data: opSort.map(function(o) { return o[1][c.campo]; }), backgroundColor: c.cor, borderRadius: 4, borderSkipped: false, stack: 'op' };
+      })
     },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#6b7897', font: { size: 11 }, boxWidth: 10, boxHeight: 10, padding: 10 } } }, scales: { x: { grid: { display: false }, ticks: { color: '#1a2035', font: { size: 11 } }, stacked: true }, y: { grid: { color: '#e8edf5' }, ticks: { color: '#6b7897', font: { size: 10 }, callback: function(v) { return 'R$' + v.toLocaleString('pt-BR'); } }, beginAtZero: true, stacked: true } } }
   });
@@ -2607,14 +2687,18 @@ function initDashboard() {
   tableFiltered = [...consumoData];
   renderKPIs(consumoData);
   renderOverviewCharts(consumoData);
+  buildDayFilterCheckboxes();
   renderDayChart();
   buildOperSelector();
   renderOperCharts();
   buildTableFilters();
   renderTable();
   buildCustosFiltros();
+  buildCustoFiltroProduto();
   renderCustos();
   buildSptFiltros();
+  buildSptQuimicoFiltro();
+  if (typeof sptData !== 'undefined' && sptData.length) renderSptComparativo();
 }
 
 
@@ -2864,7 +2948,7 @@ if (lancDataInput) lancDataInput.value = new Date().toISOString().split('T')[0];
 // ════════════════════════════════════════════════════════════════
 //  MAPA DE CAMPOS: campo consumo operadores → label e preço
 // ════════════════════════════════════════════════════════════════
-var SPT_QUIMICOS = [
+var SPT_QUIMICOS_FIXOS = [
   { campo: 'acido',    label: 'Ácido Sulfúrico', cor: '#e04535', unidade: 'kg', precoId: 'precoAcido'    },
   { campo: 'pac',      label: 'PAC',             cor: '#0fa899', unidade: 'kg', precoId: 'precoPac'      },
   { campo: 'polDec',   label: 'Pol. Decanter',   cor: '#8b5cf6', unidade: 'kg', precoId: 'precoPolDec'   },
@@ -2874,15 +2958,38 @@ var SPT_QUIMICOS = [
   { campo: 'anti',     label: 'Antiespumante',   cor: '#7a8499', unidade: 'L',  precoId: 'precoAnti'     }
 ];
 
+// Getter dinâmico: sempre inclui os químicos customizados cadastrados na aba "Novo Químico",
+// pois SPT_QUIMICOS_FIXOS por si só nunca refletiria os customs.
+function getSptQuimicos() {
+  var custom = loadCustomQuimicos().map(function(c) {
+    return { campo: c.campo, label: c.label, cor: c.cor, unidade: c.unidade || 'kg', precoId: 'preco_' + c.campo };
+  });
+  return SPT_QUIMICOS_FIXOS.concat(custom);
+}
+// Mantido por compatibilidade com código legado que referenciava a lista fixa diretamente;
+// sempre buscar via getSptQuimicos() nas funções abaixo para refletir customs em tempo real.
+Object.defineProperty(window, 'SPT_QUIMICOS', { get: function() { return getSptQuimicos(); } });
+
 // Dados do SharePoint carregados do Supabase: [{data_iso, campo, valor}]
 var sptData = [];
 
 // ════════════════════════════════════════════════════════════════
 //  INICIALIZAR TABELA DE LANÇAMENTO DO SHAREPOINT
 // ════════════════════════════════════════════════════════════════
+function buildSptQuimicoFiltro() {
+  var sel = document.getElementById('sptQuimicoFiltro');
+  if (!sel) return;
+  var prev = sel.value;
+  sel.innerHTML = getSptQuimicos().map(function(q) {
+    return '<option value="' + q.campo + '">' + q.label + '</option>';
+  }).join('');
+  if (prev && [...sel.options].some(function(o) { return o.value === prev; })) sel.value = prev;
+}
+
 function iniciarTabelaSpt() {
   var tbody = document.getElementById('sptLancBody');
   if (!tbody) return;
+  buildSptQuimicoFiltro();
   tbody.innerHTML = '';
   SPT_QUIMICOS.forEach(function(q) {
     var tr = document.createElement('tr');
